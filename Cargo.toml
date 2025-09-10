@@ -1,0 +1,9 @@
+[package]
+name = "xilem_spotify"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+librespot-core = "0.7.1"
+librespot-oauth = "0.7.1"
+xilem = { git="https://github.com/linebender/xilem"}
