@@ -7,7 +7,11 @@ mod ui;
 
 fn main() -> Result<(), EventLoopError> {
     let opts = WindowOptions::new("Native Spotify");
-    let app = Xilem::new_simple(state::App::default(), ui::root, opts);
+    let mut state = state::App::default();
+    if let Err(e) = state.spotify.init() {
+        println!("Failed to init: {}", e);
+    }
+    let app = Xilem::new_simple(state, ui::root, opts);
     app.run_in(EventLoop::with_user_event())?;
     Ok(())
 }

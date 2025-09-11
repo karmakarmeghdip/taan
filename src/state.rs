@@ -1,5 +1,10 @@
 #[derive(Default)]
 pub struct App {
-    creds: Option<librespot_core::authentication::Credentials>,
-    load_creds: bool,
+    pub authenticating: bool,
+    pub spotify: crate::spotify::SpotifyState,
+    pub user: Option<UserData>,
+}
+
+pub struct UserData {
+    pub username: String,
 }
