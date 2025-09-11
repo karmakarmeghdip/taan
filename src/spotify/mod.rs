@@ -3,7 +3,6 @@ use librespot_core::{Error, authentication::Credentials, cache::Cache};
 const CACHE: &str = ".cache";
 const CACHE_FILES: &str = ".cache/files";
 
-// pub const SPOTIFY_CLIENT_ID: &str = "edecb396d7344082b4eb39ac4d3c79f6";
 pub const SPOTIFY_CLIENT_ID: &str = "65b708073fc0480ea92a077233ca87bd";
 
 static OAUTH_SCOPES: &[&str] = &[
