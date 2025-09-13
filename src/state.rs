@@ -6,7 +6,7 @@ pub struct App {
     pub error: Option<String>,
     pub user: Option<UserData>,
     pub logged_in: bool,
-    pub tx: Option<UnboundedSender<crate::ui::Command>>,
+    pub tx: Option<UnboundedSender<crate::spotify::async_loop::Command>>,
 }
 
 #[derive(Debug)]

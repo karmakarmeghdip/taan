@@ -10,9 +10,10 @@ pub fn login_button(data: &mut App) -> impl WidgetView<App> + use<> {
     if !data.authenticating {
         if !data.logged_in {
             OneOf3::A(button("Login with Spotify", |s: &mut App| {
-                let res =
-                    s.tx.as_ref()
-                        .map(|t| t.send(super::Command::AttemptOAuth).ok());
+                let res = s.tx.as_ref().map(|t| {
+                    t.send(crate::spotify::async_loop::Command::AttemptOAuth)
+                        .ok()
+                });
                 s.authenticating = res.is_some();
             }))
         } else {
