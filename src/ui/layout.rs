@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use rspotify::model::PlayableItem;
 use xilem::{
     WidgetView,
@@ -63,7 +61,14 @@ pub fn playlist_view(state: &mut App) -> impl WidgetView<App> + use<> {
                         let name = t.name.clone();
                         let id = t.id.clone();
                         OneOf2::A(button(format!("{:?}", name), move |s: &mut App| {
-                            println!("Playing {:#?}", id);
+                            let id = id.as_ref().expect("Missing track id");
+                            println!("Playing {:#?}", id.to_string());
+                            s.tx.as_ref()
+                                .unwrap()
+                                .send(crate::spotify::async_loop::Command::PlayTrack(
+                                    id.to_string(),
+                                ))
+                                .unwrap();
                         }))
                     } else {
                         OneOf2::B(label("Unknown playlist item"))

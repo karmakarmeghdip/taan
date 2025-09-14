@@ -1,4 +1,3 @@
-use librespot_metadata::playlist::item::PlaylistItems;
 use rspotify::model::SimplifiedPlaylist;
 use xilem::{core::MessageProxy, tokio::sync::mpsc::UnboundedReceiver};
 
@@ -52,6 +51,16 @@ pub(crate) async fn run_spotify_loop(
                         .expect("IPC error, fatal"),
                 }
             }
+            Command::PlayTrack(i) => {
+                let _ = spot.play_track(i).inspect_err(|e| {
+                    proxy
+                        .message(Event::Error(e.to_string()))
+                        .expect("IPC error, fatal")
+                });
+            }
+            Command::Pause => {
+                spot.pause();
+            }
         }
     }
 }
@@ -59,6 +68,7 @@ pub(crate) async fn run_spotify_loop(
 pub(crate) fn handle_event(state: &mut App, msg: Event) {
     match msg {
         Event::Error(e) => {
+            println!("An error occured: {}", e);
             state.error = Some(e);
         }
         Event::LoginSuccess(u) => {
@@ -89,4 +99,6 @@ pub enum Command {
     AttemptOAuth,
     GetUserPlaylists,
     GetPlaylistTracks(rspotify::model::PlaylistId<'static>),
+    PlayTrack(String),
+    Pause,
 }

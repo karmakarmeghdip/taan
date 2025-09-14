@@ -1,6 +1,8 @@
 use std::{sync::Arc, time::Duration};
 
-use librespot_core::{Error, Session, SessionConfig, authentication::Credentials, cache::Cache};
+use librespot_core::{
+    Error, Session, SessionConfig, SpotifyId, authentication::Credentials, cache::Cache,
+};
 use librespot_playback::{
     audio_backend,
     config::{AudioFormat, PlayerConfig},
@@ -169,6 +171,15 @@ impl SpotifyState {
                 }
             }
         }
+    }
+
+    pub fn play_track(&self, id: String) -> Result<(), Error> {
+        let track_id = SpotifyId::from_uri(&id)?;
+        self.player.load(track_id, true, 0);
+        Ok(())
+    }
+    pub fn pause(&self) {
+        self.player.pause();
     }
 
     pub fn is_logged_in(&self) -> bool {
