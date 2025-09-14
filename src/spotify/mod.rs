@@ -1,4 +1,13 @@
+use std::sync::Arc;
+
 use librespot_core::{Error, Session, SessionConfig, authentication::Credentials, cache::Cache};
+use librespot_playback::{
+    audio_backend,
+    config::{AudioFormat, PlayerConfig},
+    mixer::NoOpVolume,
+    player::Player,
+};
+use rspotify::{AuthCodeSpotify, ClientError, model::SimplifiedPlaylist, prelude::OAuthClient};
 
 const CACHE: &str = ".cache";
 const CACHE_FILES: &str = ".cache/files";
@@ -36,6 +45,8 @@ pub mod async_loop;
 pub struct SpotifyState {
     session: Session,
     creds: Option<Credentials>,
+    player: Arc<Player>,
+    client: AuthCodeSpotify,
 }
 
 impl Default for SpotifyState {
@@ -44,7 +55,25 @@ impl Default for SpotifyState {
             .expect("Failed to initalise cache, fatal");
         let creds = cache.credentials();
         let session = Session::new(SessionConfig::default(), Some(cache));
-        SpotifyState { session, creds }
+        let player = Player::new(
+            PlayerConfig::default(),
+            session.clone(),
+            Box::new(NoOpVolume),
+            || {
+                audio_backend::find(None).expect("Failed to initialise audio backend, fatal")(
+                    None,
+                    AudioFormat::default(),
+                )
+            },
+        );
+        let mut client = AuthCodeSpotify::default();
+        client.config.token_refreshing = false;
+        SpotifyState {
+            session,
+            creds,
+            player,
+            client,
+        }
     }
 }
 impl SpotifyState {
@@ -57,10 +86,49 @@ impl SpotifyState {
                 true,
             )
             .await?;
+        self.web_auth().await;
         Ok(())
     }
+
+    pub async fn web_auth(&self) {
+        let token = self
+            .session
+            .login5()
+            .auth_token()
+            .await
+            .expect("Not Logged in");
+
+        let rtoken = rspotify::Token {
+            access_token: token.access_token,
+            expires_in: chrono::TimeDelta::from_std(token.expires_in)
+                .expect("Invalid expiry, fatal"),
+            scopes: token.scopes.into_iter().collect(),
+            ..Default::default()
+        };
+
+        *self.client.token.lock().await.unwrap() = Some(rtoken);
+    }
     pub fn get_username(&self) -> String {
-        self.session.username()
+        self.session.username() // Replace with Rspotify user name
+    }
+
+    pub async fn get_me(&self) -> Result<rspotify::model::PrivateUser, Error> {
+        self.client
+            .current_user()
+            .await
+            .map_err(|e| Error::unauthenticated(e))
+    }
+
+    pub async fn get_playlists(
+        &self,
+        limit: u32,
+        offset: u32,
+    ) -> Result<Vec<SimplifiedPlaylist>, ClientError> {
+        let playlists = self
+            .client
+            .current_user_playlists_manual(Some(limit), Some(offset))
+            .await?;
+        Ok(playlists.items)
     }
 
     pub fn is_logged_in(&self) -> bool {

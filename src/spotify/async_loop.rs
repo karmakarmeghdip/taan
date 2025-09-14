@@ -1,9 +1,6 @@
 use xilem::{core::MessageProxy, tokio::sync::mpsc::UnboundedReceiver};
 
-use crate::{
-    spotify::SpotifyState,
-    state::{App, UserData},
-};
+use crate::{spotify::SpotifyState, state::App};
 
 pub(crate) async fn run_spotify_loop(
     proxy: MessageProxy<Event>,
@@ -12,15 +9,13 @@ pub(crate) async fn run_spotify_loop(
     let mut spot = SpotifyState::default();
     let _ = spot.connect().await.inspect_err(|e| println!("{}", e));
     if spot.is_logged_in() {
-        if let Err(e) = proxy.message(Event::LoginSuccess(UserData {
-            username: spot.get_username(),
-        })) {
-            println!("{}", e);
-        }
+        proxy
+            .message(Event::LoginSuccess(
+                spot.get_me().await.expect("Auth token, fatal"),
+            ))
+            .expect("IPC error, fatal");
     } else {
-        if let Err(e) = proxy.message(Event::NotLoggedIn) {
-            println!("{}", e);
-        }
+        proxy.message(Event::NotLoggedIn).expect("IPC error, fatal");
     }
     while let Some(cmd) = rx.recv().await {
         match cmd {
@@ -31,12 +26,16 @@ pub(crate) async fn run_spotify_loop(
                         .inspect_err(|e| println!("{}", e));
                 } else {
                     let _ = proxy
-                        .message(Event::LoginSuccess(UserData {
-                            username: spot.get_username(),
-                        }))
+                        .message(Event::LoginSuccess(
+                            spot.get_me().await.expect("Auth token, fatal"),
+                        ))
                         .inspect_err(|e| println!("{}", e));
                 }
             }
+            Command::GetUserPlaylists => match spot.get_playlists(10, 0).await {
+                Ok(list) => println!("{:#?}", list),
+                Err(e) => println!("{}", e),
+            },
         }
     }
 }
@@ -48,22 +47,21 @@ pub(crate) fn handle_event(state: &mut App, msg: Event) {
         }
         Event::LoginSuccess(u) => {
             state.authenticating = false;
-            state.logged_in = true;
             state.user = Some(u);
         }
         Event::NotLoggedIn => {
             state.authenticating = false;
-            state.logged_in = false;
         }
     }
 }
 #[derive(Debug)]
 pub(crate) enum Event {
     Error(String),
-    LoginSuccess(UserData),
+    LoginSuccess(rspotify::model::PrivateUser),
     NotLoggedIn,
 }
 
 pub enum Command {
     AttemptOAuth,
+    GetUserPlaylists,
 }

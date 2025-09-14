@@ -8,7 +8,7 @@ use crate::state::App;
 
 pub fn login_button(data: &mut App) -> impl WidgetView<App> + use<> {
     if !data.authenticating {
-        if !data.logged_in {
+        if data.user.is_none() {
             OneOf3::A(button("Login with Spotify", |s: &mut App| {
                 let res = s.tx.as_ref().map(|t| {
                     t.send(crate::spotify::async_loop::Command::AttemptOAuth)
@@ -21,11 +21,11 @@ pub fn login_button(data: &mut App) -> impl WidgetView<App> + use<> {
                 "Hello, {}!!",
                 data.user
                     .as_ref()
-                    .map(|u| u.username.clone())
+                    .map(|u| u.display_name.clone().unwrap_or("User".to_string()))
                     .unwrap_or("User".to_string())
             )))
         }
     } else {
-        OneOf3::C(label("Logging in, complete the auth flow"))
+        OneOf3::C(label("Loading..."))
     }
 }

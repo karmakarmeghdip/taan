@@ -1,6 +1,6 @@
 use xilem::{
     WidgetView,
-    view::{flex_row, label},
+    view::{button, flex_col, flex_row, label},
 };
 
 use crate::state::App;
@@ -25,5 +25,13 @@ pub fn playlist_picker(_state: &mut App) -> impl WidgetView<App> + use<> {
     label("Playlist Picker")
 }
 pub fn playlist_view(_state: &mut App) -> impl WidgetView<App> + use<> {
-    label("Playlist Songs")
+    flex_col((
+        label("Playlist Songs"),
+        button("Fetch 16 playlists", |s: &mut App| {
+            s.tx.clone().inspect(|t| {
+                t.send(crate::spotify::async_loop::Command::GetUserPlaylists)
+                    .unwrap();
+            });
+        }),
+    ))
 }
