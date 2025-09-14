@@ -60,9 +60,10 @@ pub fn playlist_view(state: &mut App) -> impl WidgetView<App> + use<> {
                     if let PlayableItem::Track(t) = track {
                         let name = t.name.clone();
                         let id = t.id.clone();
-                        OneOf2::A(button(format!("{:?}", name), move |s: &mut App| {
+                        OneOf2::A(button(format!("{}", name), move |s: &mut App| {
                             let id = id.as_ref().expect("Missing track id");
-                            println!("Playing {:#?}", id.to_string());
+                            println!("Playing {}", id.to_string());
+                            s.current_name = Some(name.clone());
                             s.tx.as_ref()
                                 .unwrap()
                                 .send(crate::spotify::async_loop::Command::PlayTrack(
