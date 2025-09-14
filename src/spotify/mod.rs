@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use librespot_core::{Error, Session, SessionConfig, authentication::Credentials, cache::Cache};
 use librespot_playback::{
@@ -7,7 +7,13 @@ use librespot_playback::{
     mixer::NoOpVolume,
     player::Player,
 };
-use rspotify::{AuthCodeSpotify, ClientError, model::SimplifiedPlaylist, prelude::OAuthClient};
+use rspotify::{
+    AuthCodeSpotify, ClientError,
+    http::HttpError,
+    model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
+    prelude::{BaseClient, OAuthClient},
+};
+use xilem::tokio::time::{Instant, sleep_until};
 
 const CACHE: &str = ".cache";
 const CACHE_FILES: &str = ".cache/files";
@@ -108,9 +114,6 @@ impl SpotifyState {
 
         *self.client.token.lock().await.unwrap() = Some(rtoken);
     }
-    pub fn get_username(&self) -> String {
-        self.session.username() // Replace with Rspotify user name
-    }
 
     pub async fn get_me(&self) -> Result<rspotify::model::PrivateUser, Error> {
         self.client
@@ -119,16 +122,53 @@ impl SpotifyState {
             .map_err(|e| Error::unauthenticated(e))
     }
 
-    pub async fn get_playlists(
+    pub async fn get_user_playlists(
         &self,
         limit: u32,
         offset: u32,
-    ) -> Result<Vec<SimplifiedPlaylist>, ClientError> {
-        let playlists = self
-            .client
-            .current_user_playlists_manual(Some(limit), Some(offset))
-            .await?;
-        Ok(playlists.items)
+    ) -> Result<Vec<SimplifiedPlaylist>, Error> {
+        loop {
+            match self
+                .client
+                .current_user_playlists_manual(Some(limit), Some(offset))
+                .await
+            {
+                Ok(playlists) => {
+                    break Ok(playlists.items);
+                }
+                Err(e) => {
+                    if self.requires_refresh(e).await {
+                        continue;
+                    }
+                    break Err(Error::unauthenticated("Failed to refresh client"));
+                }
+            }
+        }
+    }
+
+    pub async fn get_playlist(
+        &self,
+        id: PlaylistId<'_>,
+        limit: u32,
+        offset: u32,
+    ) -> Result<Vec<PlaylistItem>, Error> {
+        loop {
+            match self
+                .client
+                .playlist_items_manual(id.clone(), None, None, Some(limit), Some(offset))
+                .await
+            {
+                Ok(tracks) => {
+                    break Ok(tracks.items);
+                }
+                Err(e) => {
+                    if self.requires_refresh(e).await {
+                        continue;
+                    }
+                    break Err(Error::unauthenticated("Failed to refresh client"));
+                }
+            }
+        }
     }
 
     pub fn is_logged_in(&self) -> bool {
@@ -150,5 +190,32 @@ impl SpotifyState {
         self.creds = Some(c);
         self.connect().await?;
         Ok(())
+    }
+    async fn requires_refresh(&self, e: ClientError) -> bool {
+        if let ClientError::Http(e) = e {
+            if let HttpError::StatusCode(res) = *e {
+                if res.status() == 401 {
+                    self.web_auth().await;
+                    return true;
+                }
+                if res.status() == 429 {
+                    let wait = res.headers().get("Retry-After").and_then(|v| {
+                        v.to_str()
+                            .expect("Failed to convert header to string, fatal")
+                            .parse::<u64>()
+                            .ok()
+                    });
+                    println!("rate limit hit, waiting for {}", wait.unwrap_or_default());
+                    sleep_until(
+                        Instant::now()
+                            .checked_add(Duration::from_secs(wait.unwrap_or_default()))
+                            .expect("Failed to add to delay, fatal"),
+                    )
+                    .await;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
