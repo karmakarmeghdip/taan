@@ -1,0 +1,5 @@
+[profile.dev]
+# One debuginfo file per dependency, to reduce file size of tests/examples.
+# Note that this value is not supported on Windows.
+# See https://doc.rust-lang.org/cargo/reference/profiles.html#split-debuginfo
+split-debuginfo="unpacked"

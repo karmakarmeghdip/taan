@@ -12,8 +12,8 @@ Taan (meaning "a musical phrase" in Hindustani classical music) is a lightweight
 
 Currently, Taan is a work-in-progress. Here are some of the features that are being worked on:
 
-- [ ] Spotify authentication
-- [ ] Playback of Spotify tracks
+- [x] Spotify authentication
+- [x] Playback of Spotify tracks
 - [ ] Viewing playlists, albums, and artists
 - [ ] A clean, minimal, and native user interface
 

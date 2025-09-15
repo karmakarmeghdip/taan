@@ -2,21 +2,24 @@ use rspotify::model::PlayableItem;
 use xilem::{
     WidgetView,
     core::one_of::OneOf2,
+    style::Style,
     view::{button, flex_col, flex_row, label},
 };
 
-use crate::state::App;
+use crate::{state::App, ui::colors::ThemeColor};
 
 pub fn header(state: &mut App) -> impl WidgetView<App> + use<> {
     flex_row((label("Spotify"), super::spotify_login::login_button(state)))
         .must_fill_major_axis(true)
         .main_axis_alignment(xilem::view::MainAxisAlignment::SpaceBetween)
+        .background_color(ThemeColor::from(state.theme_state.flavor.colors.surface0).0)
 }
 
 pub fn main_area(state: &mut App) -> impl WidgetView<App> + use<> {
     flex_row((playlist_picker(state), playlist_view(state)))
         .must_fill_major_axis(true)
         .main_axis_alignment(xilem::view::MainAxisAlignment::SpaceAround)
+        .background_color(ThemeColor::from(state.theme_state.flavor.colors.crust).0)
 }
 
 pub fn footer(state: &mut App) -> impl WidgetView<App> + use<> {
@@ -34,6 +37,8 @@ pub fn playlist_picker(state: &mut App) -> impl WidgetView<App> + use<> {
                         .expect("Sender unavailable, fatal")
                         .send(crate::spotify::async_loop::Command::GetPlaylistTracks(
                             pid.clone_static(),
+                            10,
+                            0,
                         ))
                         .expect("Failed to send command, fatal");
                 })
@@ -45,7 +50,7 @@ pub fn playlist_picker(state: &mut App) -> impl WidgetView<App> + use<> {
             label("No Playlists available"),
             button("Fetch playlists", |s: &mut App| {
                 s.tx.clone().inspect(|t| {
-                    t.send(crate::spotify::async_loop::Command::GetUserPlaylists)
+                    t.send(crate::spotify::async_loop::Command::GetUserPlaylists(10, 0))
                         .unwrap();
                 });
             }),

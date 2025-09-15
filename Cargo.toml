@@ -11,3 +11,4 @@ librespot-metadata = "0.7.1"
 xilem = { git="https://github.com/linebender/xilem"}
 rspotify = "0.15.1"
 chrono = "0.4.42"
+catppuccin = "2.5.1"

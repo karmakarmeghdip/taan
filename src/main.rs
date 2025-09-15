@@ -1,3 +1,4 @@
+#![windows_subsystem = "windows"]
 use xilem::winit::error::EventLoopError;
 use xilem::{EventLoop, WindowOptions, Xilem};
 

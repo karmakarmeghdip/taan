@@ -10,4 +10,5 @@ pub struct App {
     pub playlist_item: Option<Vec<PlaylistItem>>,
     pub current_name: Option<String>,
     pub tx: Option<UnboundedSender<crate::spotify::async_loop::Command>>,
+    pub theme_state: crate::ui::colors::ThemeState,
 }

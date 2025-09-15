@@ -14,9 +14,9 @@ pub(crate) async fn run_spotify_loop(
             .message(Event::LoginSuccess(
                 spot.get_me().await.expect("Auth token, fatal"),
             ))
-            .expect("IPC error, fatal");
+            .unwrap();
     } else {
-        proxy.message(Event::NotLoggedIn).expect("IPC error, fatal");
+        proxy.message(Event::NotLoggedIn).unwrap();
     }
     while let Some(cmd) = rx.recv().await {
         match cmd {
@@ -30,19 +30,21 @@ pub(crate) async fn run_spotify_loop(
                         .message(Event::LoginSuccess(
                             spot.get_me().await.expect("Auth token, fatal"),
                         ))
-                        .inspect_err(|e| println!("{}", e));
+                        .unwrap();
                 }
             }
-            Command::GetUserPlaylists => match spot.get_user_playlists(10, 0).await {
-                Ok(list) => proxy
-                    .message(Event::UserPlaylists(list))
-                    .expect("IPC error, fatal"),
-                Err(e) => proxy
-                    .message(Event::Error(e.to_string()))
-                    .expect("IPC error, fatal"),
-            },
-            Command::GetPlaylistTracks(playlist_id) => {
-                match spot.get_playlist(playlist_id, 10, 0).await {
+            Command::GetUserPlaylists(limit, offset) => {
+                match spot.get_user_playlists(limit, offset).await {
+                    Ok(list) => proxy
+                        .message(Event::UserPlaylists(list))
+                        .expect("IPC error, fatal"),
+                    Err(e) => proxy
+                        .message(Event::Error(e.to_string()))
+                        .expect("IPC error, fatal"),
+                }
+            }
+            Command::GetPlaylistTracks(playlist_id, limit, offset) => {
+                match spot.get_playlist(playlist_id, limit, offset).await {
                     Ok(list) => proxy
                         .message(Event::PlaylistItems(list))
                         .expect("IPC error, fatal"),
@@ -97,8 +99,8 @@ pub(crate) enum Event {
 
 pub enum Command {
     AttemptOAuth,
-    GetUserPlaylists,
-    GetPlaylistTracks(rspotify::model::PlaylistId<'static>),
+    GetUserPlaylists(u32, u32),
+    GetPlaylistTracks(rspotify::model::PlaylistId<'static>, u32, u32),
     PlayTrack(String),
     Pause,
 }
