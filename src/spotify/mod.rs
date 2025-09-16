@@ -15,7 +15,6 @@ use rspotify::{
     model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
 };
-use xilem::tokio::time::{Instant, sleep_until};
 
 const CACHE: &str = ".cache";
 const CACHE_FILES: &str = ".cache/files";
@@ -48,11 +47,9 @@ static OAUTH_SCOPES: &[&str] = &[
     "user-top-read",
 ];
 
-pub mod async_loop;
-
+#[derive(Clone)]
 pub struct SpotifyState {
     session: Session,
-    creds: Option<Credentials>,
     player: Arc<Player>,
     client: AuthCodeSpotify,
 }
@@ -61,7 +58,6 @@ impl Default for SpotifyState {
     fn default() -> Self {
         let cache = Cache::new(Some(CACHE), Some(CACHE), Some(CACHE_FILES), None)
             .expect("Failed to initalise cache, fatal");
-        let creds = cache.credentials();
         let session = Session::new(SessionConfig::default(), Some(cache));
         let player = Player::new(
             PlayerConfig::default(),
@@ -78,22 +74,14 @@ impl Default for SpotifyState {
         client.config.token_refreshing = false;
         SpotifyState {
             session,
-            creds,
             player,
             client,
         }
     }
 }
 impl SpotifyState {
-    pub async fn connect(&self) -> Result<(), Error> {
-        self.session
-            .connect(
-                self.creds
-                    .clone()
-                    .ok_or(Error::unauthenticated("Creds not available"))?,
-                true,
-            )
-            .await?;
+    pub async fn connect(&self, creds: Credentials) -> Result<(), Error> {
+        self.session.connect(creds, true).await?;
         self.web_auth().await;
         Ok(())
     }
@@ -122,6 +110,10 @@ impl SpotifyState {
             .current_user()
             .await
             .map_err(|e| Error::unauthenticated(e))
+    }
+
+    pub fn is_connected(&self) -> bool {
+        self.session.username().is_empty()
     }
 
     pub async fn get_user_playlists(
@@ -182,10 +174,7 @@ impl SpotifyState {
         self.player.pause();
     }
 
-    pub fn is_logged_in(&self) -> bool {
-        self.creds.is_some()
-    }
-    pub async fn auth(&mut self) -> Result<(), Error> {
+    pub async fn auth(&self) -> Result<(), Error> {
         let c = librespot_oauth::OAuthClientBuilder::new(
             SPOTIFY_CLIENT_ID,
             "http://127.0.0.1:8898/login",
@@ -198,8 +187,7 @@ impl SpotifyState {
         .await
         .map(|t| Credentials::with_access_token(t.access_token))
         .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
-        self.creds = Some(c);
-        self.connect().await?;
+        self.connect(c).await?;
         Ok(())
     }
     async fn requires_refresh(&self, e: ClientError) -> bool {
@@ -217,12 +205,7 @@ impl SpotifyState {
                             .ok()
                     });
                     println!("rate limit hit, waiting for {}", wait.unwrap_or_default());
-                    sleep_until(
-                        Instant::now()
-                            .checked_add(Duration::from_secs(wait.unwrap_or_default()))
-                            .expect("Failed to add to delay, fatal"),
-                    )
-                    .await;
+                    tokio::time::sleep(Duration::from_secs(wait.unwrap_or_default())).await;
                     return true;
                 }
             }

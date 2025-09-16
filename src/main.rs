@@ -1,18 +1,28 @@
-#![windows_subsystem = "windows"]
-use xilem::winit::error::EventLoopError;
-use xilem::{EventLoop, WindowOptions, Xilem};
+slint::include_modules!();
 
 mod spotify;
 mod state;
-mod ui;
 
-fn main() -> Result<(), EventLoopError> {
-    let opts = WindowOptions::new("Native Spotify");
-    let state = state::App {
-        authenticating: true,
-        ..Default::default()
-    };
-    let app = Xilem::new_simple(state, ui::root, opts);
-    app.run_in(EventLoop::with_user_event())?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()?;
+    let spot = rt.block_on(async { spotify::SpotifyState::default() });
+    let rt_handle = rt.handle().clone();
+    std::thread::spawn(move || {
+        rt.block_on(std::future::pending::<()>());
+    });
+    let ui = MainWindow::new()?;
+    {
+        ui.on_clicked(move || {
+            let spot = spot.clone();
+            println!("Attempting to authenticate...");
+            rt_handle.spawn(async move {
+                spot.auth().await.unwrap();
+                println!("Auth successful");
+            });
+        });
+    }
+    ui.run()?;
     Ok(())
 }
