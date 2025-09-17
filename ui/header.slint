@@ -1,0 +1,29 @@
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+
+enum AuthState {
+    LoggedOut,
+    LoggedIn,
+    Authenticating,
+}
+
+export component Header {
+    callback clicked();
+    in-out property <AuthState> authenticated: AuthState.LoggedOut;
+    HorizontalBox {
+        alignment: LayoutAlignment.space-between;
+        Text {
+            text: "Spotify";
+            font-size: 24px;
+            horizontal-alignment: center;
+        }
+
+        if authenticated == AuthState.LoggedOut:
+            Button {
+            text: "Login with your Spotify Account";
+            height: 30px;
+            clicked => {
+                clicked();
+            }
+        }
+    }
+}
