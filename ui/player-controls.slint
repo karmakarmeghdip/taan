@@ -1,0 +1,317 @@
+import { Button, VerticalBox, HorizontalBox, Slider, Palette, StyleMetrics } from "std-widgets.slint";
+
+component PlayerButton inherits Rectangle {
+    in property <string> icon;
+    in property <bool> active: false;
+    in property <length> size: 32px;
+    callback clicked();
+    width: root.size;
+    height: root.size;
+    background: touch-area.has-hover ? Palette.control-background.with-alpha(0.1) : transparent;
+    border-radius: root.size / 2;
+    Text {
+        text: root.icon;
+        color: root.active ? Palette.accent-background : Palette.foreground.with-alpha(0.9);
+        font-size: root.size * 0.4;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    touch-area := TouchArea {
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+component VolumeControl inherits HorizontalBox {
+    in-out property <float> volume: 75.0;
+    callback volume-changed(float);
+    alignment: center;
+    spacing: 8px;
+    width: 120px;
+    PlayerButton {
+        icon: "🔉";
+        size: 16px;
+        clicked => {
+            root.volume = root.volume > 0 ? 0 : 75;
+            root.volume-changed(root.volume);
+        }
+    }
+
+    Slider {
+        horizontal-stretch: 1;
+        minimum: 0;
+        maximum: 100;
+        value: root.volume;
+        changed(value) => {
+            root.volume = value;
+            root.volume-changed(value);
+        }
+    }
+}
+
+component ProgressBar inherits Rectangle {
+    in-out property <float> progress: 0.0; // 0-100
+    in property <duration> current-time: 0s;
+    in property <duration> total-time: 180s;
+    callback seek(float);
+    height: 4px;
+    background: Palette.foreground.with-alpha(0.2);
+    border-radius: 2px;
+    
+    // Progress fill
+    Rectangle {
+        width: parent.width * (root.progress / 100);
+        height: parent.height;
+        background: Palette.accent-background;
+        border-radius: parent.border-radius;
+    }
+    
+    // Interactive overlay
+    TouchArea {
+        clicked => {
+            if (self.pressed-x >= 0 && self.pressed-x <= parent.width) {
+                root.progress = (self.pressed-x / parent.width) * 100;
+                root.seek(root.progress);
+            }
+        }
+    }
+}
+
+export component PlayerControls inherits Rectangle {
+    // Player state
+    in-out property <bool> is-playing: false;
+    in-out property <bool> is-shuffled: false;
+    in-out property <bool> is-repeat: false;
+    in-out property <float> volume: 75.0;
+    in-out property <float> progress: 35.0;
+    
+    // Track info
+    in property <string> track-title: "Song Title";
+    in property <string> track-artist: "Artist Name";
+    in property <string> track-album: "Album Name";
+    in property <duration> current-time: 68s;
+    in property <duration> total-time: 195s;
+    
+    // Callbacks
+    callback play-pause-clicked();
+    callback next-clicked();
+    callback previous-clicked();
+    callback shuffle-clicked();
+    callback repeat-clicked();
+    callback volume-changed(float);
+    callback seek(float);
+    callback like-clicked();
+    height: 90px;
+    background: Palette.background.darker(0.05);
+    
+    // Top border
+    Rectangle {
+        y: 0;
+        width: parent.width;
+        height: 1px;
+        background: Palette.border;
+    }
+
+    HorizontalBox {
+        padding: 16px;
+        alignment: space-between;
+        
+        // Left section - Track info
+        HorizontalBox {
+            alignment: start;
+            spacing: 12px;
+            width: 280px;
+            
+            // Album cover
+            Rectangle {
+                width: 56px;
+                height: 56px;
+                background: #764ba2;
+                border-radius: 4px;
+                Text {
+                    text: "♪";
+                    color: white;
+                    font-size: 20px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+            
+            // Track info
+            VerticalBox {
+                alignment: center;
+                spacing: 4px;
+                horizontal-stretch: 1;
+                Text {
+                    text: root.track-title;
+                    color: Palette.foreground;
+                    font-size: 14px;
+                    font-weight: 400;
+                    overflow: elide;
+                    horizontal-alignment: left;
+                }
+
+                Text {
+                    text: root.track-artist;
+                    color: Palette.foreground.with-alpha(0.7);
+                    font-size: 12px;
+                    overflow: elide;
+                    horizontal-alignment: left;
+                }
+            }
+            
+            // Like button
+            PlayerButton {
+                icon: "♡";
+                size: 16px;
+                clicked => {
+                    root.like-clicked();
+                }
+            }
+        }
+        
+        // Center section - Playback controls
+        VerticalBox {
+            alignment: center;
+            spacing: 8px;
+            width: 320px;
+            
+            // Control buttons
+            HorizontalBox {
+                alignment: center;
+                spacing: 8px;
+                PlayerButton {
+                    icon: "🔀";
+                    active: root.is-shuffled;
+                    size: 32px;
+                    clicked => {
+                        root.shuffle-clicked();
+                    }
+                }
+
+                PlayerButton {
+                    icon: "⏮";
+                    size: 32px;
+                    clicked => {
+                        root.previous-clicked();
+                    }
+                }
+                
+                // Main play/pause button
+                Rectangle {
+                    width: 48px;
+                    height: 48px;
+                    background: main-play-touch.has-hover ? Palette.accent-background.with-alpha(0.8) : Palette.accent-background;
+                    border-radius: 24px;
+                    Text {
+                        text: root.is-playing ? "⏸" : "▶";
+                        color: Palette.accent-foreground;
+                        font-size: 16px;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    main-play-touch := TouchArea {
+                        clicked => {
+                            root.play-pause-clicked();
+                        }
+                    }
+                }
+
+                PlayerButton {
+                    icon: "⏭";
+                    size: 32px;
+                    clicked => {
+                        root.next-clicked();
+                    }
+                }
+
+                PlayerButton {
+                    icon: root.is-repeat ? "🔁" : "🔁";
+                    active: root.is-repeat;
+                    size: 32px;
+                    clicked => {
+                        root.repeat-clicked();
+                    }
+                }
+            }
+            
+            // Progress section
+            HorizontalBox {
+                alignment: center;
+                spacing: 8px;
+                width: 100%;
+                Text {
+                    text: "1:08";
+                    color: Palette.foreground.with-alpha(0.7);
+                    font-size: 11px;
+                    min-width: 35px;
+                }
+
+                ProgressBar {
+                    horizontal-stretch: 1;
+                    progress: root.progress;
+                    current-time: root.current-time;
+                    total-time: root.total-time;
+                    seek(value) => {
+                        root.seek(value);
+                    }
+                }
+
+                Text {
+                    text: "3:15";
+                    color: Palette.foreground.with-alpha(0.7);
+                    font-size: 11px;
+                    min-width: 35px;
+                }
+            }
+        }
+        
+        // Right section - Additional controls
+        HorizontalBox {
+            alignment: end;
+            spacing: 8px;
+            width: 280px;
+            PlayerButton {
+                icon: "🎤";
+                size: 16px;
+                clicked => {
+                    debug("Lyrics clicked");
+                }
+            }
+
+            PlayerButton {
+                icon: "🔗";
+                size: 16px;
+                clicked => {
+                    debug("Queue clicked");
+                }
+            }
+
+            PlayerButton {
+                icon: "💻";
+                size: 16px;
+                clicked => {
+                    debug("Connect device clicked");
+                }
+            }
+
+            VolumeControl {
+                volume: root.volume;
+                volume-changed(vol) => {
+                    root.volume-changed(vol);
+                }
+            }
+
+            PlayerButton {
+                icon: "⛶";
+                size: 16px;
+                clicked => {
+                    debug("Fullscreen clicked");
+                }
+            }
+        }
+    }
+}

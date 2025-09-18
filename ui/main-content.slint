@@ -1,0 +1,484 @@
+import { Button, VerticalBox, HorizontalBox, ScrollView, Palette, StyleMetrics } from "std-widgets.slint";
+
+component SectionHeader inherits HorizontalBox {
+    in property <string> title;
+    in property <string> subtitle: "";
+    callback show-all-clicked();
+    alignment: space-between;
+    padding-bottom: 12px;
+    VerticalBox {
+        alignment: start;
+        spacing: 4px;
+        Text {
+            text: root.title;
+            color: Palette.foreground;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        if root.subtitle != "": Text {
+            text: root.subtitle;
+            color: Palette.foreground.with-alpha(0.7);
+            font-size: 14px;
+        }
+    }
+
+    Button {
+        text: "Show all";
+        clicked => {
+            root.show-all-clicked();
+        }
+    }
+}
+
+component MusicCard inherits Rectangle {
+    in property <string> title;
+    in property <string> subtitle;
+    in property <string> image-url: "";
+    in property <bool> is-playing: false;
+    callback clicked();
+    callback play-clicked();
+    width: 180px;
+    height: 240px;
+    background: touch-area.has-hover ? Palette.control-background.with-alpha(0.1) : transparent;
+    border-radius: 8px;
+    VerticalBox {
+        padding: 16px;
+        spacing: 12px;
+        
+        // Album/Playlist cover
+        cover := Rectangle {
+            width: 148px;
+            height: 148px;
+            background: Palette.control-background;
+            border-radius: 8px;
+            drop-shadow-blur: touch-area.has-hover ? 16px : 0px;
+            drop-shadow-color: black.with-alpha(0.3);
+            
+            // Placeholder for album art
+            Rectangle {
+                background: #667eea;
+                border-radius: parent.border-radius;
+                Text {
+                    text: "♪";
+                    color: white;
+                    font-size: 48px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+            
+            // Play button overlay
+            if touch-area.has-hover || root.is-playing: play-button := Rectangle {
+                width: 48px;
+                height: 48px;
+                x: parent.width - self.width - 8px;
+                y: parent.height - self.height - 8px;
+                background: #1db954;
+                border-radius: 24px;
+                drop-shadow-blur: 8px;
+                drop-shadow-color: black.with-alpha(0.3);
+                Text {
+                    text: root.is-playing ? "⏸" : "▶";
+                    color: white;
+                    font-size: 16px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                play-touch := TouchArea {
+                    clicked => {
+                        root.play-clicked();
+                    }
+                }
+            }
+        }
+        
+        // Text content
+        VerticalBox {
+            alignment: start;
+            spacing: 4px;
+            Text {
+                text: root.title;
+                color: Palette.foreground;
+                font-size: 16px;
+                font-weight: 600;
+                overflow: elide;
+            }
+
+            Text {
+                text: root.subtitle;
+                color: Palette.foreground.with-alpha(0.7);
+                font-size: 14px;
+                overflow: elide;
+            }
+        }
+    }
+
+    touch-area := TouchArea {
+        clicked => {
+            root.clicked();
+        }
+    }
+    
+    // Hover animation
+    animate drop-shadow-blur {
+        duration: 200ms;
+        easing: ease-in-out;
+    }
+}
+
+component QuickPlayCard inherits Rectangle {
+    in property <string> title;
+    in property <string> image-url: "";
+    in property <bool> is-playing: false;
+    callback clicked();
+    callback play-clicked();
+    width: 380px;
+    height: 80px;
+    background: Palette.control-background.with-alpha(touch-area.has-hover ? 0.2 : 0.1);
+    border-radius: 4px;
+    HorizontalBox {
+        alignment: start;
+        
+        // Cover image
+        Rectangle {
+            width: 80px;
+            height: 80px;
+            background: #f093fb;
+            border-radius: 4px;
+            Text {
+                text: "♪";
+                color: white;
+                font-size: 24px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        
+        // Content
+        HorizontalBox {
+            alignment: space-between;
+            padding-left: 16px;
+            padding-right: 16px;
+            horizontal-stretch: 1;
+            Text {
+                text: root.title;
+                color: Palette.foreground;
+                font-size: 16px;
+                font-weight: 600;
+                vertical-alignment: center;
+            }
+
+            if touch-area.has-hover || root.is-playing: Rectangle {
+                width: 32px;
+                height: 32px;
+                background: root.is-playing ? Palette.accent-background : transparent;
+                border-radius: 16px;
+                Text {
+                    text: root.is-playing ? "⏸" : "▶";
+                    color: root.is-playing ? Palette.accent-foreground : Palette.foreground;
+                    font-size: 12px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                play-touch := TouchArea {
+                    clicked => {
+                        root.play-clicked();
+                    }
+                }
+            }
+        }
+    }
+
+    touch-area := TouchArea {
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+export component MainContent inherits Rectangle {
+    callback card-clicked(string);
+    callback play-clicked(string);
+    callback show-all-clicked(string);
+    background: Palette.background;
+    ScrollView {
+        VerticalBox {
+            padding: StyleMetrics.layout-padding * 2;
+            spacing: 32px;
+            
+            // Greeting and Quick Actions
+            VerticalBox {
+                spacing: 24px;
+                Text {
+                    text: "Good afternoon";
+                    color: Palette.foreground;
+                    font-size: 32px;
+                    font-weight: 700;
+                }
+                
+                // Quick Play Grid
+                HorizontalBox {
+                    spacing: 16px;
+                    alignment: start;
+                    VerticalBox {
+                        spacing: 16px;
+                        QuickPlayCard {
+                            title: "Liked Songs";
+                            clicked => {
+                                root.card-clicked("Liked Songs");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Liked Songs");
+                            }
+                        }
+
+                        QuickPlayCard {
+                            title: "Recently Played";
+                            clicked => {
+                                root.card-clicked("Recently Played");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Recently Played");
+                            }
+                        }
+
+                        QuickPlayCard {
+                            title: "Downloaded";
+                            clicked => {
+                                root.card-clicked("Downloaded");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Downloaded");
+                            }
+                        }
+                    }
+
+                    VerticalBox {
+                        spacing: 16px;
+                        QuickPlayCard {
+                            title: "Discover Weekly";
+                            clicked => {
+                                root.card-clicked("Discover Weekly");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Discover Weekly");
+                            }
+                        }
+
+                        QuickPlayCard {
+                            title: "Release Radar";
+                            clicked => {
+                                root.card-clicked("Release Radar");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Release Radar");
+                            }
+                        }
+
+                        QuickPlayCard {
+                            title: "Daily Mix 1";
+                            clicked => {
+                                root.card-clicked("Daily Mix 1");
+                            }
+                            play-clicked => {
+                                root.play-clicked("Daily Mix 1");
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Recently Played
+            VerticalBox {
+                spacing: 16px;
+                SectionHeader {
+                    title: "Recently played";
+                    show-all-clicked => {
+                        root.show-all-clicked("Recently played");
+                    }
+                }
+
+                HorizontalBox {
+                    spacing: 16px;
+                    alignment: start;
+                    MusicCard {
+                        title: "Chill Hits";
+                        subtitle: "Spotify";
+                        clicked => {
+                            root.card-clicked("Chill Hits");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Chill Hits");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Today's Top Hits";
+                        subtitle: "Spotify";
+                        clicked => {
+                            root.card-clicked("Today's Top Hits");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Today's Top Hits");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "RapCaviar";
+                        subtitle: "Spotify";
+                        is-playing: true;
+                        clicked => {
+                            root.card-clicked("RapCaviar");
+                        }
+                        play-clicked => {
+                            root.play-clicked("RapCaviar");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Jazz Vibes";
+                        subtitle: "Spotify";
+                        clicked => {
+                            root.card-clicked("Jazz Vibes");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Jazz Vibes");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Indie Rock";
+                        subtitle: "Spotify";
+                        clicked => {
+                            root.card-clicked("Indie Rock");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Indie Rock");
+                        }
+                    }
+                }
+            }
+            
+            // Made for you
+            VerticalBox {
+                spacing: 16px;
+                SectionHeader {
+                    title: "Made for you";
+                    show-all-clicked => {
+                        root.show-all-clicked("Made for you");
+                    }
+                }
+
+                HorizontalBox {
+                    spacing: 16px;
+                    alignment: start;
+                    MusicCard {
+                        title: "Discover Weekly";
+                        subtitle: "Your weekly mixtape of fresh music";
+                        clicked => {
+                            root.card-clicked("Discover Weekly");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Discover Weekly");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Release Radar";
+                        subtitle: "Catch all the latest music from artists you follow";
+                        clicked => {
+                            root.card-clicked("Release Radar");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Release Radar");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Daily Mix 1";
+                        subtitle: "Ariana Grande, Taylor Swift, Dua Lipa and more";
+                        clicked => {
+                            root.card-clicked("Daily Mix 1");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Daily Mix 1");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Daily Mix 2";
+                        subtitle: "Ed Sheeran, The Weeknd, Post Malone and more";
+                        clicked => {
+                            root.card-clicked("Daily Mix 2");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Daily Mix 2");
+                        }
+                    }
+                }
+            }
+            
+            // Popular playlists
+            VerticalBox {
+                spacing: 16px;
+                SectionHeader {
+                    title: "Popular playlists";
+                    show-all-clicked => {
+                        root.show-all-clicked("Popular playlists");
+                    }
+                }
+
+                HorizontalBox {
+                    spacing: 16px;
+                    alignment: start;
+                    MusicCard {
+                        title: "Today's Top Hits";
+                        subtitle: "The biggest songs in the world";
+                        clicked => {
+                            root.card-clicked("Today's Top Hits");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Today's Top Hits");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Global Top 50";
+                        subtitle: "The most played songs in the world";
+                        clicked => {
+                            root.card-clicked("Global Top 50");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Global Top 50");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "Viral 50";
+                        subtitle: "The most viral tracks right now";
+                        clicked => {
+                            root.card-clicked("Viral 50");
+                        }
+                        play-clicked => {
+                            root.play-clicked("Viral 50");
+                        }
+                    }
+
+                    MusicCard {
+                        title: "New Music Friday";
+                        subtitle: "The best new music, updated every Friday";
+                        clicked => {
+                            root.card-clicked("New Music Friday");
+                        }
+                        play-clicked => {
+                            root.play-clicked("New Music Friday");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

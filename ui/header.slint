@@ -1,29 +1,273 @@
-import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { Button, VerticalBox, HorizontalBox, Palette, StyleMetrics } from "std-widgets.slint";
 
-enum AuthState {
+export enum AuthState {
     LoggedOut,
     LoggedIn,
     Authenticating,
 }
 
-export component Header {
-    callback clicked();
-    in-out property <AuthState> authenticated: AuthState.LoggedOut;
+component SearchBar inherits Rectangle {
+    in-out property <string> search-text;
+    callback search-changed(string);
+    callback search-submitted(string);
+    width: 360px;
+    height: 40px;
+    background: Palette.control-background;
+    border-radius: 20px;
+    border-width: 1px;
+    border-color: search-input.has-focus ? Palette.accent-background : transparent;
     HorizontalBox {
-        alignment: LayoutAlignment.space-between;
+        padding-left: 16px;
+        padding-right: 16px;
+        alignment: center;
+        
+        // Search icon
         Text {
-            text: "Taan";
-            font-size: 24px;
-            horizontal-alignment: center;
+            text: "🔍";
+            color: Palette.foreground.with-alpha(0.6);
+            font-size: 16px;
         }
 
-        if authenticated == AuthState.LoggedOut:
-            Button {
-            text: "Login with your Spotify Account";
-            height: 30px;
-            clicked => {
-                clicked();
+        search-input := TextInput {
+            text: root.search-text;
+            horizontal-stretch: 1;
+            font-size: 14px;
+            color: Palette.foreground;
+            single-line: true;
+            edited => {
+                root.search-text = self.text;
+                root.search-changed(self.text);
+            }
+            accepted => {
+                root.search-submitted(self.text);
             }
         }
+        
+        // Placeholder text (shown when input is empty and doesn't have focus)
+        if root.search-text == "" && !search-input.has-focus: Text {
+            text: "What do you want to listen to?";
+            color: Palette.foreground.with-alpha(0.5);
+            font-size: 14px;
+            horizontal-alignment: left;
+            vertical-alignment: center;
+        }
+        
+        // Clear button (shown when there's text)
+        if root.search-text != "": Rectangle {
+            width: 20px;
+            height: 20px;
+            background: touch-clear.has-hover ? Palette.foreground.with-alpha(0.1) : transparent;
+            border-radius: 10px;
+            Text {
+                text: "✕";
+                color: Palette.foreground.with-alpha(0.6);
+                font-size: 12px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            touch-clear := TouchArea {
+                clicked => {
+                    root.search-text = "";
+                    root.search-changed("");
+                }
+            }
+        }
+    }
+}
+
+component NavigationButton inherits Rectangle {
+    in property <string> icon;
+    in property <bool> enabled: true;
+    callback clicked();
+    width: 32px;
+    height: 32px;
+    background: touch-area.has-hover ? Palette.control-background.with-alpha(0.1) : transparent;
+    border-radius: 16px;
+    opacity: root.enabled ? 1.0 : 0.5;
+    Text {
+        text: root.icon;
+        color: Palette.foreground;
+        font-size: 16px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    touch-area := TouchArea {
+        enabled: root.enabled;
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+component UserProfile inherits Rectangle {
+    in property <string> username: "User";
+    in property <string> avatar-url: "";
+    callback profile-clicked();
+    callback logout-clicked();
+    width: 120px;
+    height: 32px;
+    background: touch-area.has-hover ? Palette.control-background.with-alpha(0.1) : transparent;
+    border-radius: 16px;
+    HorizontalBox {
+        padding-left: 8px;
+        padding-right: 8px;
+        alignment: center;
+        spacing: 8px;
+        
+        // Avatar
+        Rectangle {
+            width: 24px;
+            height: 24px;
+            background: Palette.accent-background;
+            border-radius: 12px;
+            Text {
+                text: "J";
+                color: Palette.accent-foreground;
+                font-size: 12px;
+                font-weight: 600;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        Text {
+            text: root.username;
+            color: Palette.foreground;
+            font-size: 14px;
+            font-weight: 500;
+            overflow: elide;
+        }
+
+        Text {
+            text: "▼";
+            color: Palette.foreground.with-alpha(0.6);
+            font-size: 10px;
+        }
+    }
+
+    touch-area := TouchArea {
+        clicked => {
+            root.profile-clicked();
+        }
+    }
+}
+
+export component Header inherits Rectangle {
+    callback login-clicked();
+    callback search-changed(string);
+    callback search-submitted(string);
+    callback back-clicked();
+    callback forward-clicked();
+    callback profile-clicked();
+    in-out property <AuthState> authenticated: AuthState.LoggedOut;
+    in-out property <string> search-text;
+    in property <bool> can-go-back: false;
+    in property <bool> can-go-forward: false;
+    in property <string> username: "John Doe";
+    height: 60px;
+    background: Palette.background;
+    HorizontalBox {
+        padding: StyleMetrics.layout-padding;
+        alignment: space-between;
+        
+        // Left section - Navigation
+        HorizontalBox {
+            alignment: start;
+            spacing: 16px;
+            
+            // App logo/title
+            HorizontalBox {
+                alignment: center;
+                spacing: 12px;
+                Rectangle {
+                    width: 32px;
+                    height: 32px;
+                    background: #1db954;
+                    border-radius: 16px;
+                    Text {
+                        text: "♪";
+                        color: white;
+                        font-size: 18px;
+                        font-weight: 700;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                Text {
+                    text: "Taan";
+                    color: Palette.foreground;
+                    font-size: 20px;
+                    font-weight: 700;
+                }
+            }
+            
+            // Navigation buttons
+            HorizontalBox {
+                alignment: center;
+                spacing: 8px;
+                NavigationButton {
+                    icon: "←";
+                    enabled: root.can-go-back;
+                    clicked => {
+                        root.back-clicked();
+                    }
+                }
+
+                NavigationButton {
+                    icon: "→";
+                    enabled: root.can-go-forward;
+                    clicked => {
+                        root.forward-clicked();
+                    }
+                }
+            }
+        }
+        
+        // Center section - Search (only when logged in)
+        if root.authenticated == AuthState.LoggedIn: SearchBar {
+            search-text: root.search-text;
+            search-changed(text) => {
+                root.search-changed(text);
+            }
+            search-submitted(text) => {
+                root.search-submitted(text);
+            }
+        }
+        
+        // Right section - User actions
+        HorizontalBox {
+            alignment: end;
+            spacing: 16px;
+            if root.authenticated == AuthState.LoggedOut: Button {
+                text: "Login with Spotify";
+                height: 36px;
+                clicked => {
+                    root.login-clicked();
+                }
+            }
+            if root.authenticated == AuthState.Authenticating: Text {
+                text: "Connecting...";
+                color: Palette.foreground.with-alpha(0.7);
+                font-size: 14px;
+                vertical-alignment: center;
+            }
+            if root.authenticated == AuthState.LoggedIn: UserProfile {
+                username: root.username;
+                profile-clicked => {
+                    root.profile-clicked();
+                }
+            }
+        }
+    }
+    
+    // Bottom border
+    Rectangle {
+        y: parent.height - 1px;
+        width: parent.width;
+        height: 1px;
+        background: Palette.border;
     }
 }
