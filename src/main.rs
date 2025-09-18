@@ -7,16 +7,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rt = setup_rt()?;
     let spot = rt.block_on(async { spotify::SpotifyState::default() });
     let ui = MainWindow::new()?;
-    // {
-    //     ui.on_clicked(move || {
-    //         let spot = spot.clone();
-    //         println!("Attempting to authenticate...");
-    //         rt.spawn(async move {
-    //             spot.auth().await.unwrap();
-    //             println!("Auth successful");
-    //         });
-    //     });
-    // }
+
     ui.run()?;
     Ok(())
 }
