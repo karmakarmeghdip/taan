@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* A custom gradient background similar to the image */
+        .bg-player-gradient {
+            background: linear-gradient(180deg, #4a3e4c 0%, #3b323d 100%);
+        }
+        .resizable-player {
+            resize: both;
+            overflow: hidden; /* Changed from auto to hidden to prevent scrolling */
+            min-width: 300px;
+            min-height: 500px;
+            /* Provide a default size */
+            width: 24rem; /* 384px */
+            height: 42rem; /* 672px */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Music Player Container -->
+    <div class="resizable-player rounded-2xl shadow-2xl bg-player-gradient text-white relative flex flex-col">
+        
+        <!-- Close Button -->
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-all duration-300 hover:bg-white/10 p-1.5 rounded-full z-10">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Top section with Album Art (will grow and shrink) -->
+        <div class="px-6 pt-10 pb-2 flex-grow flex items-center justify-center min-h-0">
+             <img src="https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94" alt="Album Art" class="rounded-lg shadow-lg max-w-full max-h-full object-contain">
+        </div>
+       
+        <!-- Bottom section with info and controls (will not shrink) -->
+        <div class="p-6 pt-2 flex flex-col space-y-4 flex-shrink-0">
+             <!-- Progress Bar -->
+            <div class="w-full">
+                <div class="flex items-center justify-center space-x-2">
+                    <span class="text-xs text-gray-400 w-8 text-left">0:19</span>
+                    <div class="flex-grow flex items-center h-2">
+                        <div class="w-full h-1 bg-gray-600 rounded-full flex items-center">
+                            <div class="w-1/4 h-1 bg-white rounded-l-full"></div>
+                             <div class="w-px h-2.5 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 w-8 text-right">-3:46</span>
+                </div>
+            </div>
+
+            <!-- Song Information -->
+            <div class="text-center">
+                <h2 class="text-2xl font-bold tracking-tight">Albireo</h2>
+                <p class="text-gray-400">Rokudenashi</p>
+                <p class="text-sm text-gray-500 mt-1">Written by ナユタン星人</p>
+            </div>
+
+            <!-- Main Controls -->
+            <div class="flex items-center justify-center space-x-6">
+                <button class="text-gray-400 hover:text-white transition-all duration-300 p-3 hover:bg-white/10 rounded-full">
+                    <i data-lucide="rewind" class="w-8 h-8"></i>
+                </button>
+                <button class="p-4 bg-gray-700/50 rounded-full text-white hover:bg-gray-600/50 transition-colors duration-300">
+                    <i data-lucide="play" class="w-8 h-8"></i>
+                </button>
+                <button class="text-gray-400 hover:text-white transition-all duration-300 p-3 hover:bg-white/10 rounded-full">
+                    <i data-lucide="fast-forward" class="w-8 h-8"></i>
+                </button>
+            </div>
+            
+             <!-- Volume Control -->
+            <div class="w-full flex items-center space-x-3 px-2">
+                <i data-lucide="volume-1" class="text-gray-400"></i>
+                <div class="flex-grow bg-gray-600 rounded-full h-1.5">
+                    <div class="bg-white h-1.5 rounded-full" style="width: 70%"></div>
+                </div>
+                <i data-lucide="volume-2" class="text-gray-400"></i>
+            </div>
+
+            <!-- Additional Controls -->
+            <div class="w-full flex justify-around pt-2">
+                <button class="text-gray-400 hover:text-white transition-all duration-300 p-2 hover:bg-white/10 rounded-lg">
+                    <i data-lucide="square"></i>
+                </button>
+                 <button class="text-gray-400 hover:text-white transition-all duration-300 p-2 hover:bg-white/10 rounded-lg">
+                    <i data-lucide="shuffle"></i>
+                </button>
+                <button class="text-gray-400 hover:text-white transition-all duration-300 p-2 hover:bg-white/10 rounded-lg">
+                    <i data-lucide="repeat"></i>
+                </button>
+                <button class="text-gray-400 hover:text-white transition-all duration-300 p-2 hover:bg-white/10 rounded-lg">
+                    <i data-lucide="list-music"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

@@ -1,7 +1,6 @@
 slint::include_modules!();
 
 mod spotify;
-mod state;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rt = setup_rt()?;

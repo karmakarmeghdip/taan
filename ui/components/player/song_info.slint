@@ -1,0 +1,30 @@
+export component SongInfo inherits Rectangle {
+    in-out property <string> song-title: "Song Title";
+    in-out property <string> artist-name: "Artist Name";
+    in-out property <string> composer: "Composer Name";
+    VerticalLayout {
+        alignment: center;
+        spacing: 4px;
+        song-title-text := Text {
+            text: root.song-title;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            horizontal-alignment: center;
+        }
+
+        artist-text := Text {
+            text: root.artist-name;
+            color: #9ca3af;
+            font-size: 16px;
+            horizontal-alignment: center;
+        }
+
+        composer-text := Text {
+            text: "Written by " + root.composer;
+            color: #6b7280;
+            font-size: 14px;
+            horizontal-alignment: center;
+        }
+    }
+}

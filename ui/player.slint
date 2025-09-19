@@ -1,0 +1,112 @@
+import { AlbumArt } from "components/player/album_art.slint";
+import { PlayerControls } from "components/player/player_controls.slint";
+import { CloseButton } from "components/player/close_button.slint";
+
+export component MusicPlayer inherits Window {
+    title: "Music Player";
+    // Player dimensions - matching HTML defaults
+    preferred-width: 384px;
+    preferred-height: 672px;
+    
+    // Resizable constraints - matching HTML
+    min-width: 300px;
+    min-height: 500px;
+    
+    // Properties for player state
+    property <string> song-title: "Albireo";
+    property <string> artist-name: "Rokudenashi";
+    property <string> composer: "ナユタン星人";
+    property <string> album-art-url: "https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94";
+    property <float> progress: 0.25; // 0.0 to 1.0
+    property <string> current-time: "0:19";
+    property <string> remaining-time: "-3:46";
+    property <float> volume: 0.7; // 0.0 to 1.0
+    property <bool> is-playing: false;
+    
+    // Background - using solid color since Slint doesn't support CSS-style gradients
+    background: #4a3e4c;
+    
+    // Main layout - vertical with album art area that grows and controls area that's fixed
+    VerticalLayout {
+        padding: 0px;
+        spacing: 0px;
+        
+        // Album art section (flex-grow equivalent)
+        album-art-container := Rectangle {
+            vertical-stretch: 1; // This makes it grow to fill available space
+            
+            album-art := AlbumArt {
+                album-art-url: root.album-art-url;
+            }
+        }
+        
+        // Controls section (fixed height - equivalent to flex-shrink: 0)
+        player-controls := PlayerControls {
+            song-title: root.song-title;
+            artist-name: root.artist-name;
+            composer: root.composer;
+            progress <=> root.progress;
+            current-time: root.current-time;
+            remaining-time: root.remaining-time;
+            volume <=> root.volume;
+            is-playing <=> root.is-playing;
+            
+            // Forward all callbacks
+            seek(value) => {
+                // Handle seek to position
+                debug("Seeking to: ", value);
+            }
+            
+            volume-changed(value) => {
+                // Handle volume change
+                debug("Volume changed to: ", value);
+            }
+            
+            previous-clicked => {
+                // Handle previous track
+                debug("Previous clicked");
+            }
+            
+            play-pause-clicked => {
+                root.is-playing = !root.is-playing;
+                debug("Play/Pause clicked, now: ", root.is-playing);
+            }
+            
+            next-clicked => {
+                // Handle next track
+                debug("Next clicked");
+            }
+            
+            stop-clicked => {
+                // Handle stop
+                debug("Stop clicked");
+            }
+            
+            shuffle-clicked => {
+                // Handle shuffle
+                debug("Shuffle clicked");
+            }
+            
+            repeat-clicked => {
+                // Handle repeat
+                debug("Repeat clicked");
+            }
+            
+            playlist-clicked => {
+                // Handle playlist
+                debug("Playlist clicked");
+            }
+        }
+    }
+    
+    // Close button (positioned absolutely in top-right)
+    close-button := CloseButton {
+        x: parent.width - self.width - 16px;
+        y: 16px;
+        
+        close-clicked => {
+            // Handle close
+            debug("Close clicked");
+        }
+    }
+}

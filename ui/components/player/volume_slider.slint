@@ -1,0 +1,75 @@
+export component VolumeSlider inherits Rectangle {
+    in-out property <float> volume: 0.7; // 0.0 to 1.0
+    
+    callback volume-changed(float); // Emitted when volume changes
+    
+    height: 24px;
+    HorizontalLayout {
+        spacing: 12px;
+        alignment: center;
+        volume-low-icon := Image {
+            source: @image-url("../../../resources/icons/volume-1.svg");
+            width: 16px;
+            height: 16px;
+            colorize: #9ca3af;
+        }
+
+        volume-slider-container := Rectangle {
+            horizontal-stretch: 1;
+            height: 16px;
+            
+            // Volume bar background
+            volume-bar := Rectangle {
+                width: parent.width;
+                height: 4px;
+                y: (parent.height - self.height) / 2;
+                background: #4b5563;
+                border-radius: 2px;
+                
+                // Volume fill
+                volume-fill := Rectangle {
+                    width: parent.width * root.volume;
+                    height: parent.height;
+                    background: white;
+                    border-radius: 2px;
+                }
+                
+                // Volume handle
+                volume-handle := Rectangle {
+                    width: 8px;
+                    height: 8px;
+                    background: white;
+                    border-radius: 4px;
+                    x: (parent.width * root.volume) - (self.width / 2);
+                    y: (parent.height - self.height) / 2;
+                }
+                
+                // TouchArea for volume control - covers the entire volume area
+                volume-touch := TouchArea {
+                    width: parent.width;
+                    height: 16px; // Cover full container height
+                    
+                    clicked => {
+                        let new-volume = max(0, min(1, self.mouse-x / self.width));
+                        root.volume = new-volume;
+                        root.volume-changed(new-volume);
+                    }
+                    moved => {
+                        if (self.pressed) {
+                            let new-volume = max(0, min(1, self.mouse-x / self.width));
+                            root.volume = new-volume;
+                            root.volume-changed(new-volume);
+                        }
+                    }
+                }
+            }
+        }
+
+        volume-high-icon := Image {
+            source: @image-url("../../../resources/icons/volume-2.svg");
+            width: 16px;
+            height: 16px;
+            colorize: #9ca3af;
+        }
+    }
+}

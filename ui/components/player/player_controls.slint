@@ -1,0 +1,90 @@
+import { ProgressBar } from "progress_bar.slint";
+import { VolumeSlider } from "volume_slider.slint";
+import { SongInfo } from "song_info.slint";
+import { MainControls } from "main_controls.slint";
+import { AdditionalControls } from "additional_controls.slint";
+
+export component PlayerControls inherits Rectangle {
+    // Properties for player state
+    in-out property <string> song-title: "Albireo";
+    in-out property <string> artist-name: "Rokudenashi";
+    in-out property <string> composer: "ナユタン星人";
+    in-out property <float> progress: 0.25; // 0.0 to 1.0
+    in-out property <string> current-time: "0:19";
+    in-out property <string> remaining-time: "-3:46";
+    in-out property <float> volume: 0.7; // 0.0 to 1.0
+    in-out property <bool> is-playing: false;
+    
+    // Callbacks
+    callback seek(float);
+    callback volume-changed(float);
+    callback previous-clicked();
+    callback play-pause-clicked();
+    callback next-clicked();
+    callback stop-clicked();
+    callback shuffle-clicked();
+    callback repeat-clicked();
+    callback playlist-clicked();
+    vertical-stretch: 0; // Fixed size, won't shrink
+    
+    VerticalLayout {
+        padding: 24px;
+        padding-top: 8px;
+        spacing: 16px;
+        
+        // Progress bar section
+        progress-bar := ProgressBar {
+            progress <=> root.progress;
+            current-time: root.current-time;
+            remaining-time: root.remaining-time;
+            seek(value) => {
+                root.seek(value);
+            }
+        }
+        
+        // Song information section
+        song-info := SongInfo {
+            song-title: root.song-title;
+            artist-name: root.artist-name;
+            composer: root.composer;
+        }
+        
+        // Main controls section  
+        main-controls := MainControls {
+            is-playing: root.is-playing;
+            previous-clicked => {
+                root.previous-clicked();
+            }
+            play-pause-clicked => {
+                root.play-pause-clicked();
+            }
+            next-clicked => {
+                root.next-clicked();
+            }
+        }
+        
+        // Volume control section
+        volume-slider := VolumeSlider {
+            volume <=> root.volume;
+            volume-changed(value) => {
+                root.volume-changed(value);
+            }
+        }
+        
+        // Additional controls section
+        additional-controls := AdditionalControls {
+            stop-clicked => {
+                root.stop-clicked();
+            }
+            shuffle-clicked => {
+                root.shuffle-clicked();
+            }
+            repeat-clicked => {
+                root.repeat-clicked();
+            }
+            playlist-clicked => {
+                root.playlist-clicked();
+            }
+        }
+    }
+}

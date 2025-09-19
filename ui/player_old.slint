@@ -1,0 +1,456 @@
+import { AlbumArt } from "components/player/album_art.slint";
+import { PlayerControls } from "components/player/player_controls.slint";
+import { CloseButton } from "components/player/close_button.slint";
+
+export component MusicPlayer inherits Window {
+    title: "Music Player";
+    // Player dimensions - matching HTML defaults
+    preferred-width: 384px;
+    preferred-height: 672px;
+    
+    // Resizable constraints - matching HTML
+    min-width: 300px;
+    min-height: 500px;
+    
+    // Properties for player state
+    property <string> song-title: "Albireo";
+    property <string> artist-name: "Rokudenashi";
+    property <string> composer: "ナユタン星人";
+    property <string> album-art-url: "https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94";
+    property <float> progress: 0.25; // 0.0 to 1.0
+    property <string> current-time: "0:19";
+    property <string> remaining-time: "-3:46";
+    property <float> volume: 0.7; // 0.0 to 1.0
+    property <bool> is-playing: false;
+    
+    // Background - using solid color since Slint doesn't support CSS-style gradients
+    background: #4a3e4c;
+    
+    // Main layout - vertical with album art area that grows and controls area that's fixed
+    VerticalLayout {
+        padding: 0px;
+        spacing: 0px;
+        
+        // Album art section (flex-grow equivalent)
+        album-art-container := Rectangle {
+            vertical-stretch: 1; // This makes it grow to fill available space
+            
+            // Center the album art within available space
+            album-art := Rectangle {
+                // Use a fixed maximum size to prevent layout loops
+                width: min(300px, parent.width - 48px); // Account for margins
+                height: min(300px, parent.height - 56px); // Account for top/bottom margins (40px + 16px)
+                x: (parent.width - self.width) / 2;
+                y: 40px + (parent.height - 56px - self.height) / 2; // 40px top margin + center in remaining space
+                border-radius: 8px;
+                clip: true;
+                Image {
+                    // Note: For dynamic images, you'll need to handle this in the host language
+                    // For now using a placeholder path
+                    source: @image-url("../resources/album-art-placeholder.jpg");
+                    image-fit: contain;
+                    width: parent.width;
+                    height: parent.height;
+                }
+            }
+        }
+        
+        // Controls section (fixed height - equivalent to flex-shrink: 0)
+        controls-container := Rectangle {
+            vertical-stretch: 0; // Fixed size, won't shrink
+            
+            VerticalLayout {
+                padding: 24px;
+                padding-top: 8px;
+                spacing: 16px;
+                
+                // Progress bar section
+                progress-section := Rectangle {
+                    height: 20px;
+                    HorizontalLayout {
+                        alignment: center;
+                        spacing: 8px;
+                        current-time-text := Text {
+                            text: root.current-time;
+                            color: #9ca3af;
+                            font-size: 12px;
+                            horizontal-alignment: left;
+                            width: 32px;
+                        }
+                        
+                        // Progress bar container
+                        progress-container := Rectangle {
+                            horizontal-stretch: 1;
+                            height: 16px;
+                            
+                            // Progress bar background
+                            progress-bar := Rectangle {
+                                width: parent.width;
+                                height: 4px;
+                                y: (parent.height - self.height) / 2;
+                                background: #4b5563;
+                                border-radius: 2px;
+                                
+                                // Progress fill
+                                progress-fill := Rectangle {
+                                    width: parent.width * root.progress;
+                                    height: parent.height;
+                                    background: white;
+                                    border-radius: 2px;
+                                }
+                                
+                                // Progress handle
+                                progress-handle := Rectangle {
+                                    width: 12px;
+                                    height: 12px;
+                                    background: white;
+                                    border-radius: 6px;
+                                    x: (parent.width * root.progress) - (self.width / 2);
+                                    y: (parent.height - self.height) / 2;
+                                }
+                                
+                                // TouchArea for seeking - covers the entire progress area
+                                progress-touch := TouchArea {
+                                    width: parent.width;
+                                    height: 16px; // Cover full container height
+                                    
+                                    clicked => {
+                                        root.progress = max(0, min(1, self.mouse-x / self.width));
+                                    }
+                                    
+                                    moved => {
+                                        if (self.pressed) {
+                                            root.progress = max(0, min(1, self.mouse-x / self.width));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        remaining-time-text := Text {
+                            text: root.remaining-time;
+                            color: #9ca3af;
+                            font-size: 12px;
+                            horizontal-alignment: right;
+                            width: 32px;
+                        }
+                    }
+                }
+                
+                // Song information section
+                song-info := Rectangle {
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: 4px;
+                        song-title-text := Text {
+                            text: root.song-title;
+                            color: white;
+                            font-size: 24px;
+                            font-weight: 700;
+                            horizontal-alignment: center;
+                        }
+
+                        artist-text := Text {
+                            text: root.artist-name;
+                            color: #9ca3af;
+                            font-size: 16px;
+                            horizontal-alignment: center;
+                        }
+
+                        composer-text := Text {
+                            text: "Written by " + root.composer;
+                            color: #6b7280;
+                            font-size: 14px;
+                            horizontal-alignment: center;
+                        }
+                    }
+                }
+                
+                // Main controls section  
+                main-controls := Rectangle {
+                    height: 80px;
+                    HorizontalLayout {
+                        alignment: center;
+                        spacing: 24px;
+                        
+                        // Previous button
+                        prev-button := Rectangle {
+                            width: 56px;
+                            height: 56px;
+                            border-radius: 28px;
+                            Image {
+                                source: @image-url("../resources/icons/rewind.svg");
+                                width: 32px;
+                                height: 32px;
+                                colorize: #9ca3af;
+                            }
+
+                            prev-touch := TouchArea {
+                                clicked => {
+                                    // Handle previous track
+                                }
+                            }
+
+                            states [
+                                pressed when prev-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+                        
+                        // Play/Pause button
+                        play-button := Rectangle {
+                            width: 72px;
+                            height: 72px;
+                            background: rgba(107, 114, 128, 0.5);
+                            border-radius: 36px;
+                            Image {
+                                source: @image-url("../resources/icons/play.svg");
+                                width: 32px;
+                                height: 32px;
+                                colorize: white;
+                            }
+
+                            play-touch := TouchArea {
+                                clicked => {
+                                    root.is-playing = !root.is-playing;
+                                }
+                            }
+
+                            states [
+                                pressed when play-touch.pressed: {
+                                    background: rgba(107, 114, 128, 0.7);
+                                }
+                            ]
+                        }
+                        
+                        // Next button
+                        next-button := Rectangle {
+                            width: 56px;
+                            height: 56px;
+                            border-radius: 28px;
+                            Image {
+                                source: @image-url("../resources/icons/fast-forward.svg");
+                                width: 32px;
+                                height: 32px;
+                                colorize: #9ca3af;
+                            }
+
+                            next-touch := TouchArea {
+                                clicked => {
+                                    // Handle next track
+                                }
+                            }
+
+                            states [
+                                pressed when next-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+                    }
+                }
+                
+                // Volume control section
+                volume-section := Rectangle {
+                    height: 24px;
+                    HorizontalLayout {
+                        spacing: 12px;
+                        alignment: center;
+                        volume-low-icon := Image {
+                            source: @image-url("../resources/icons/volume-1.svg");
+                            width: 16px;
+                            height: 16px;
+                            colorize: #9ca3af;
+                        }
+
+                        volume-slider-container := Rectangle {
+                            horizontal-stretch: 1;
+                            height: 16px;
+                            
+                            // Volume bar background
+                            volume-bar := Rectangle {
+                                width: parent.width;
+                                height: 4px;
+                                y: (parent.height - self.height) / 2;
+                                background: #4b5563;
+                                border-radius: 2px;
+                                
+                                // Volume fill
+                                volume-fill := Rectangle {
+                                    width: parent.width * root.volume;
+                                    height: parent.height;
+                                    background: white;
+                                    border-radius: 2px;
+                                }
+                                
+                                // Volume handle
+                                volume-handle := Rectangle {
+                                    width: 8px;
+                                    height: 8px;
+                                    background: white;
+                                    border-radius: 4px;
+                                    x: (parent.width * root.volume) - (self.width / 2);
+                                    y: (parent.height - self.height) / 2;
+                                }
+                                
+                                // TouchArea for volume control - covers the entire volume area
+                                volume-touch := TouchArea {
+                                    width: parent.width;
+                                    height: 16px; // Cover full container height
+                                    
+                                    clicked => {
+                                        root.volume = max(0, min(1, self.mouse-x / self.width));
+                                    }
+                                    
+                                    moved => {
+                                        if (self.pressed) {
+                                            root.volume = max(0, min(1, self.mouse-x / self.width));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        volume-high-icon := Image {
+                            source: @image-url("../resources/icons/volume-2.svg");
+                            width: 16px;
+                            height: 16px;
+                            colorize: #9ca3af;
+                        }
+                    }
+                }
+                
+                // Additional controls section
+                additional-controls := Rectangle {
+                    height: 40px;
+                    HorizontalLayout {
+                        alignment: space-around;
+                        stop-button := Rectangle {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            Image {
+                                source: @image-url("../resources/icons/square.svg");
+                                width: 16px;
+                                height: 16px;
+                                colorize: #9ca3af;
+                            }
+
+                            stop-touch := TouchArea {
+                                clicked => {
+                                    // Handle stop
+                                }
+                            }
+
+                            states [
+                                pressed when stop-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+
+                        shuffle-button := Rectangle {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            Image {
+                                source: @image-url("../resources/icons/shuffle.svg");
+                                width: 16px;
+                                height: 16px;
+                                colorize: #9ca3af;
+                            }
+
+                            shuffle-touch := TouchArea {
+                                clicked => {
+                                    // Handle shuffle
+                                }
+                            }
+
+                            states [
+                                pressed when shuffle-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+
+                        repeat-button := Rectangle {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            Image {
+                                source: @image-url("../resources/icons/repeat.svg");
+                                width: 16px;
+                                height: 16px;
+                                colorize: #9ca3af;
+                            }
+
+                            repeat-touch := TouchArea {
+                                clicked => {
+                                    // Handle repeat
+                                }
+                            }
+
+                            states [
+                                pressed when repeat-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+
+                        playlist-button := Rectangle {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            Image {
+                                source: @image-url("../resources/icons/list-music.svg");
+                                width: 16px;
+                                height: 16px;
+                                colorize: #9ca3af;
+                            }
+
+                            playlist-touch := TouchArea {
+                                clicked => {
+                                    // Handle playlist
+                                }
+                            }
+
+                            states [
+                                pressed when playlist-touch.pressed: {
+                                    background: rgba(255, 255, 255, 0.1);
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Close button (positioned absolutely in top-right)
+    close-button := Rectangle {
+        width: 32px;
+        height: 32px;
+        x: parent.width - self.width - 16px;
+        y: 16px;
+        border-radius: 16px;
+        Image {
+            source: @image-url("../resources/icons/x.svg");
+            width: 20px;
+            height: 20px;
+            colorize: #9ca3af;
+        }
+
+        close-touch := TouchArea {
+            clicked => {
+                // Handle close
+            }
+        }
+
+        states [
+            hovered when close-touch.has-hover: {
+                background: rgba(255, 255, 255, 0.1);
+            }
+        ]
+    }
+}
