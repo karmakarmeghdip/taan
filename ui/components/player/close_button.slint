@@ -1,26 +1,9 @@
-export component CloseButton inherits Rectangle {
+import { CloseButton as CommonCloseButton } from "../common/button.slint";
+
+export component CloseButton inherits CommonCloseButton {
     callback close-clicked();
     
-    // Parent will position this component, so no x/y here
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-    Image {
-        source: @image-url("../../../resources/icons/x.svg");
-        width: 20px;
-        height: 20px;
-        colorize: #9ca3af;
+    clicked => {
+        root.close-clicked();
     }
-
-    close-touch := TouchArea {
-        clicked => {
-            root.close-clicked();
-        }
-    }
-
-    states [
-        hovered when close-touch.has-hover: {
-            background: rgba(255, 255, 255, 0.1);
-        }
-    ]
 }

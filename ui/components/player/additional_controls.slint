@@ -1,117 +1,73 @@
+import { IconButton, ButtonSize, ButtonShape, Colors } from "../common/mod.slint";
+
 export component AdditionalControls inherits Rectangle {
     callback stop-clicked();
     callback shuffle-clicked();
     callback repeat-clicked();
     callback playlist-clicked();
     height: 40px;
+    
     HorizontalLayout {
         alignment: space-around;
-        stop-button := Rectangle {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        
+        // Stop button
+        stop-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.stop-clicked();
+            }
+            
             Image {
                 source: @image-url("../../../resources/icons/square.svg");
                 width: 16px;
                 height: 16px;
-                colorize: #9ca3af;
+                colorize: Colors.icon-secondary;
             }
-
-            stop-touch := TouchArea {
-                clicked => {
-                    root.stop-clicked();
-                }
-            }
-
-            states [
-                pressed when stop-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when stop-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
         }
 
-        shuffle-button := Rectangle {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        // Shuffle button
+        shuffle-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.shuffle-clicked();
+            }
+            
             Image {
                 source: @image-url("../../../resources/icons/shuffle.svg");
                 width: 16px;
                 height: 16px;
-                colorize: #9ca3af;
+                colorize: Colors.icon-secondary;
             }
-
-            shuffle-touch := TouchArea {
-                clicked => {
-                    root.shuffle-clicked();
-                }
-            }
-
-            states [
-                pressed when shuffle-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when shuffle-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
         }
 
-        repeat-button := Rectangle {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        // Repeat button
+        repeat-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.repeat-clicked();
+            }
+            
             Image {
                 source: @image-url("../../../resources/icons/repeat.svg");
                 width: 16px;
                 height: 16px;
-                colorize: #9ca3af;
+                colorize: Colors.icon-secondary;
             }
-
-            repeat-touch := TouchArea {
-                clicked => {
-                    root.repeat-clicked();
-                }
-            }
-
-            states [
-                pressed when repeat-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when repeat-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
         }
 
-        playlist-button := Rectangle {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        // Playlist button
+        playlist-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.playlist-clicked();
+            }
+            
             Image {
                 source: @image-url("../../../resources/icons/list-music.svg");
                 width: 16px;
                 height: 16px;
-                colorize: #9ca3af;
+                colorize: Colors.icon-secondary;
             }
-
-            playlist-touch := TouchArea {
-                clicked => {
-                    root.playlist-clicked();
-                }
-            }
-
-            states [
-                pressed when playlist-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when playlist-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
         }
     }
 }

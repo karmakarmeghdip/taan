@@ -1,6 +1,7 @@
 import { AlbumArt } from "components/player/album_art.slint";
 import { PlayerControls } from "components/player/player_controls.slint";
 import { CloseButton } from "components/player/close_button.slint";
+import { Colors } from "components/common/colors.slint";
 
 export component MusicPlayer inherits Window {
     title: "Music Player";
@@ -23,8 +24,8 @@ export component MusicPlayer inherits Window {
     property <float> volume: 0.7; // 0.0 to 1.0
     property <bool> is-playing: false;
     
-    // Background - using solid color since Slint doesn't support CSS-style gradients
-    background: #4a3e4c;
+    // Background - using the centralized color system
+    background: Colors.background-primary;
     
     // Main layout - vertical with album art area that grows and controls area that's fixed
     VerticalLayout {

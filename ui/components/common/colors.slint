@@ -1,0 +1,76 @@
+// Central color palette for the music player application
+// Based on Slint best practices for theming and color management
+
+export global Colors {
+    // Primary background colors
+    out property <brush> background-primary: #4a3e4c;
+    out property <brush> background-secondary: rgba(107, 114, 128, 0.5);
+    out property <brush> background-surface: rgba(255, 255, 255, 0.1);
+    
+    // Text colors
+    out property <brush> text-primary: white;
+    out property <brush> text-secondary: #9ca3af;
+    out property <brush> text-muted: #6b7280;
+    
+    // Button states
+    out property <brush> button-background-default: rgba(107, 114, 128, 0.5);
+    out property <brush> button-background-hover: rgba(107, 114, 128, 0.6);
+    out property <brush> button-background-pressed: rgba(107, 114, 128, 0.7);
+    
+    // Icon button states
+    out property <brush> icon-button-background-default: transparent;
+    out property <brush> icon-button-background-hover: rgba(255, 255, 255, 0.1);
+    out property <brush> icon-button-background-pressed: rgba(255, 255, 255, 0.1);
+    
+    // Icon colors
+    out property <brush> icon-primary: white;
+    out property <brush> icon-secondary: #9ca3af;
+    out property <brush> icon-muted: #6b7280;
+    
+    // Progress and slider colors
+    out property <brush> slider-track: #4b5563;
+    out property <brush> slider-fill: white;
+    out property <brush> slider-handle: white;
+    
+    // Border and accent colors
+    out property <brush> border-default: rgba(255, 255, 255, 0.2);
+    out property <brush> accent-primary: #3b82f6;
+    out property <brush> accent-secondary: #8b5cf6;
+    
+    // Semantic colors
+    out property <brush> success: #10b981;
+    out property <brush> warning: #f59e0b;
+    out property <brush> error: #ef4444;
+    out property <brush> info: #06b6d4;
+    
+    // Opacity levels
+    out property <float> opacity-disabled: 0.5;
+    out property <float> opacity-hover: 0.8;
+    out property <float> opacity-pressed: 0.9;
+}
+
+// Design tokens for consistent spacing and sizing
+export global Spacing {
+    out property <length> xs: 4px;
+    out property <length> sm: 8px;
+    out property <length> md: 12px;
+    out property <length> lg: 16px;
+    out property <length> xl: 24px;
+    out property <length> xxl: 32px;
+}
+
+// Common border radius values
+export global BorderRadius {
+    out property <length> sm: 4px;
+    out property <length> md: 8px;
+    out property <length> lg: 12px;
+    out property <length> xl: 16px;
+    out property <length> full: 999px; // For circular elements
+}
+
+// Animation durations for consistency
+export global Animations {
+    out property <duration> fast: 100ms;
+    out property <duration> normal: 200ms;
+    out property <duration> slow: 300ms;
+}

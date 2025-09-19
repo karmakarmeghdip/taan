@@ -1,3 +1,5 @@
+import { IconButton, PrimaryButton, ButtonSize, ButtonShape, Colors, Spacing } from "../common/mod.slint";
+
 export component MainControls inherits Rectangle {
     in-out property <bool> is-playing: false;
     callback previous-clicked();
@@ -6,107 +8,62 @@ export component MainControls inherits Rectangle {
     height: 72px;
     HorizontalLayout {
         alignment: center;
-        spacing: 24px;
-        
-        // Previous button
+        spacing: Spacing.xl;
         Rectangle {
             height: parent.height;
-            preferred-width: parent.height;
-            prev-button := Rectangle {
-                width: 52px;
-                height: 52px;
-                border-radius: 26px;
+        // Previous button (circular like original)
+        prev-button := IconButton {
+                size: ButtonSize.medium;
+                shape: ButtonShape.circle;
+                clicked => {
+                    root.previous-clicked();
+                }
                 Image {
                     source: @image-url("../../../resources/icons/rewind.svg");
-                    width: 32px;
-                    height: 32px;
-                    colorize: #9ca3af;
+                    width: 24px;
+                    height: 24px;
+                    colorize: Colors.icon-secondary;
                 }
+            }
+        }
 
-                prev-touch := TouchArea {
-                    clicked => {
-                        root.previous-clicked();
-                    }
-                }
-
-                states [
-                    pressed when prev-touch.pressed: {
-                        background: rgba(255, 255, 255, 0.1);
-                    }
-                    hovered when prev-touch.has-hover: {
-                        background: rgba(255, 255, 255, 0.1);
-                    }
-                ]
+        // Play/Pause button (primary action, circular by default)
+        play-button := PrimaryButton {
+            size: ButtonSize.large;
+            shape: ButtonShape.circle;
+            clicked => {
+                root.play-pause-clicked();
+            }
+            if root.is-playing: Image {
+                source: @image-url("../../../resources/icons/pause.svg");
+                width: 32px;
+                height: 32px;
+                colorize: Colors.icon-primary;
+            }
+            if !root.is-playing: Image {
+                source: @image-url("../../../resources/icons/play.svg");
+                width: 32px;
+                height: 32px;
+                colorize: Colors.icon-primary;
             }
         }
 
         Rectangle {
             height: parent.height;
-            preferred-width: parent.height;
-        // Play/Pause button
-        play-button := Rectangle {
-                width: 72px;
-                height: 72px;
-                background: rgba(107, 114, 128, 0.5);
-                border-radius: 36px;
-                if root.is-playing: Image {
-                    source: @image-url("../../../resources/icons/pause.svg");
-                    width: 32px;
-                    height: 32px;
-                    colorize: white;
-                }
-                if !root.is-playing: Image {
-                    source: @image-url("../../../resources/icons/play.svg");
-                    width: 32px;
-                    height: 32px;
-                    colorize: white;
-                }
-                play-touch := TouchArea {
-                    clicked => {
-                        root.play-pause-clicked();
-                    }
-                }
 
-                states [
-                    pressed when play-touch.pressed: {
-                        background: rgba(107, 114, 128, 0.7);
-                    }
-                    hovered when play-touch.has-hover: {
-                        background: rgba(107, 114, 128, 0.6);
-                    }
-                ]
-            }
-        }
-
-        Rectangle {
-            height: parent.height;
-            preferred-width: parent.height;
-        // Next button
-        next-button := Rectangle {
-                width: 52px;
-                height: 52px;
-                border-radius: 26px;
+        // Next button (circular like original)
+        next-button := IconButton {
+                size: ButtonSize.medium;
+                shape: ButtonShape.circle;
+                clicked => {
+                    root.next-clicked();
+                }
                 Image {
                     source: @image-url("../../../resources/icons/fast-forward.svg");
-                    width: 32px;
-                    height: 32px;
-                    colorize: #9ca3af;
+                    width: 24px;
+                    height: 24px;
+                    colorize: Colors.icon-secondary;
                 }
-
-                next-touch := TouchArea {
-                    clicked => {
-                        root.next-clicked();
-                    }
-                }
-
-                states [
-                    pressed when next-touch.pressed: {
-                        background: rgba(255, 255, 255, 0.1);
-                    }
-                    hovered when next-touch.has-hover: {
-                        background: rgba(255, 255, 255, 0.1);
-                    }
-                ]
             }
         }
     }

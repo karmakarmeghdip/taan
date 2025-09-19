@@ -1,0 +1,176 @@
+import { Colors, Spacing, BorderRadius, Animations } from "colors.slint";
+
+// Reusable slider component for progress bars, volume controls, etc.
+export component Slider inherits Rectangle {
+    // Properties
+    in-out property <float> value: 0.0; // Current value (0.0 to 1.0)
+    in property <bool> enabled: true;
+    in property <bool> show-handle: true;
+    in property <length> track-height: 4px;
+    in property <length> handle-size: 12px;
+    
+    // Callbacks
+    callback value-changed(float); // Emitted when value changes
+    
+    // Styling
+    height: max(track-height, handle-size) + 4px; // Add padding for handle
+    
+    // Slider track background
+    slider-track := Rectangle {
+        width: parent.width;
+        height: track-height;
+        y: (parent.height - self.height) / 2;
+        background: Colors.slider-track;
+        border-radius: track-height / 2;
+        
+        // Slider fill (progress)
+        slider-fill := Rectangle {
+            width: parent.width * root.value;
+            height: parent.height;
+            background: Colors.slider-fill;
+            border-radius: parent.border-radius;
+        }
+        
+        // Slider handle
+        if show-handle: slider-handle := Rectangle {
+            width: handle-size;
+            height: handle-size;
+            background: Colors.slider-handle;
+            border-radius: handle-size / 2;
+            x: (parent.width * root.value) - (self.width / 2);
+            y: (parent.height - self.height) / 2;
+            
+            // Handle states
+            states [
+                hovered when touch-area.has-hover && root.enabled: {
+                    width: handle-size + 2px;
+                    height: handle-size + 2px;
+                    border-radius: (handle-size + 2px) / 2;
+                }
+                pressed when touch-area.pressed && root.enabled: {
+                    width: handle-size + 4px;
+                    height: handle-size + 4px;
+                    border-radius: (handle-size + 4px) / 2;
+                }
+            ]
+            animate width, height, border-radius { duration: Animations.fast; }
+        }
+    }
+    
+    // Touch interaction area
+    touch-area := TouchArea {
+        enabled: root.enabled;
+        width: parent.width;
+        height: parent.height;
+        clicked => {
+            let new-value = max(0, min(1, self.mouse-x / self.width));
+            root.value = new-value;
+            root.value-changed(new-value);
+        }
+        moved => {
+            if (self.pressed) {
+                let new-value = max(0, min(1, self.mouse-x / self.width));
+                root.value = new-value;
+                root.value-changed(new-value);
+            }
+        }
+    }
+    
+    // Disabled state
+    states [
+        disabled when !root.enabled: {
+            opacity: Colors.opacity-disabled;
+        }
+    ]
+    animate opacity { duration: Animations.fast; }
+}
+
+// Progress bar component - specialized slider for showing progress without interaction
+export component ProgressBar inherits Rectangle {
+    // Properties
+    in-out property <float> progress: 0.0; // Progress value (0.0 to 1.0)
+    in-out property <string> current-time: "0:00";
+    in-out property <string> remaining-time: "-0:00";
+    
+    // Callbacks
+    callback seek(float); // Emitted when user seeks to a position
+    
+    height: 20px;
+    HorizontalLayout {
+        alignment: center;
+        spacing: Spacing.sm;
+        
+        // Current time
+        current-time-text := Text {
+            text: root.current-time;
+            color: Colors.text-secondary;
+            font-size: 12px;
+            horizontal-alignment: left;
+            min-width: 32px;
+            max-width: 32px;
+        }
+        
+        // Progress slider
+        progress-slider := Slider {
+            horizontal-stretch: 1;
+            value <=> root.progress;
+            track-height: 4px;
+            handle-size: 12px;
+            value-changed(new-value) => {
+                root.seek(new-value);
+            }
+        }
+        
+        // Remaining time
+        remaining-time-text := Text {
+            text: root.remaining-time;
+            color: Colors.text-secondary;
+            font-size: 12px;
+            horizontal-alignment: right;
+            min-width: 32px;
+            max-width: 32px;
+        }
+    }
+}
+
+// Volume slider component - specialized slider with volume icons
+export component VolumeSlider inherits Rectangle {
+    // Properties
+    in-out property <float> volume: 0.7; // Volume value (0.0 to 1.0)
+    
+    // Callbacks
+    callback volume-changed(float); // Emitted when volume changes
+    
+    height: 24px;
+    HorizontalLayout {
+        spacing: Spacing.md;
+        alignment: center;
+        
+        // Volume low icon
+        volume-low-icon := Image {
+            source: @image-url("../../../resources/icons/volume-1.svg");
+            width: 16px;
+            height: 16px;
+            colorize: Colors.icon-secondary;
+        }
+        
+        // Volume slider
+        volume-slider := Slider {
+            horizontal-stretch: 1;
+            value <=> root.volume;
+            track-height: 4px;
+            handle-size: 8px;
+            value-changed(new-value) => {
+                root.volume-changed(new-value);
+            }
+        }
+        
+        // Volume high icon
+        volume-high-icon := Image {
+            source: @image-url("../../../resources/icons/volume-2.svg");
+            width: 16px;
+            height: 16px;
+            colorize: Colors.icon-secondary;
+        }
+    }
+}

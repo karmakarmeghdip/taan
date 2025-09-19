@@ -1,0 +1,123 @@
+import { Colors, Spacing, BorderRadius, Animations } from "colors.slint";
+
+// Enums for button variants, sizes, and shapes
+export enum ButtonVariant {
+    primary,    // Filled button with background
+    icon,       // Icon-only button with transparent background
+    text,       // Text-only button
+}
+
+export enum ButtonSize {
+    small,      // 32px
+    medium,     // 52px (default)
+    large,      // 72px
+}
+
+export enum ButtonShape {
+    circle,         // Fully circular
+    rounded-square, // Rounded rectangle
+}
+
+// Primary button component with filled background - used for main actions like play/pause
+export component PrimaryButton inherits Rectangle {
+    // Properties
+    in-out property <bool> enabled: true;
+    in-out property <ButtonSize> size: ButtonSize.medium;
+    in-out property <ButtonShape> shape: ButtonShape.circle;
+    
+    // Callbacks
+    callback clicked <=> touch-area.clicked;
+    
+    // Styling
+    property <length> button-size: size == ButtonSize.small ? 32px : (size == ButtonSize.medium ? 52px : 72px);
+    property <length> border-radius-value: shape == ButtonShape.circle ? button-size / 2 : BorderRadius.md;
+    width: button-size;
+    height: button-size;
+    border-radius: border-radius-value;
+    background: Colors.button-background-default;
+    
+    // Content placeholder - child elements will be placed here
+    @children
+    
+    // Touch interaction
+    touch-area := TouchArea {
+        enabled: root.enabled;
+        width: parent.width;
+        height: parent.height;
+    }
+    
+    // Button states with animations
+    states [
+        disabled when !root.enabled: {
+            opacity: Colors.opacity-disabled;
+        }
+        pressed when touch-area.pressed && root.enabled: {
+            background: Colors.button-background-pressed;
+        }
+        hovered when touch-area.has-hover && root.enabled: {
+            background: Colors.button-background-hover;
+        }
+    ]
+    
+    // Smooth transitions
+    animate background { duration: Animations.fast; }
+    animate opacity { duration: Animations.fast; }
+}
+
+// Icon-only button for common use cases - used for secondary actions
+export component IconButton inherits Rectangle {
+    // Properties
+    in-out property <bool> enabled: true;
+    in-out property <ButtonSize> size: ButtonSize.medium;
+    in-out property <ButtonShape> shape: ButtonShape.rounded-square;
+    
+    // Callbacks
+    callback clicked <=> touch-area.clicked;
+    
+    // Styling
+    property <length> button-size: size == ButtonSize.small ? 32px : (size == ButtonSize.medium ? 40px : 52px);
+    property <length> border-radius-value: shape == ButtonShape.circle ? button-size / 2 : BorderRadius.md;
+    width: button-size;
+    height: button-size;
+    border-radius: border-radius-value;
+    background: Colors.icon-button-background-default;
+    
+    // Content placeholder - child elements (like Image) will be placed here
+    @children
+    
+    // Touch interaction
+    touch-area := TouchArea {
+        enabled: root.enabled;
+        width: parent.width;
+        height: parent.height;
+    }
+    
+    // States with animations
+    states [
+        disabled when !root.enabled: {
+            opacity: Colors.opacity-disabled;
+        }
+        pressed when touch-area.pressed && root.enabled: {
+            background: Colors.icon-button-background-pressed;
+        }
+        hovered when touch-area.has-hover && root.enabled: {
+            background: Colors.icon-button-background-hover;
+        }
+    ]
+    
+    // Smooth transitions
+    animate background { duration: Animations.fast; }
+    animate opacity { duration: Animations.fast; }
+}
+
+// Close button component - specialized for window close actions
+export component CloseButton inherits IconButton {
+    size: ButtonSize.small;
+    shape: ButtonShape.circle;
+    Image {
+        source: @image-url("../../../resources/icons/x.svg");
+        width: 20px;
+        height: 20px;
+        colorize: Colors.icon-secondary;
+    }
+}
