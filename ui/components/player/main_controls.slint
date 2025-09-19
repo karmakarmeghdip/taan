@@ -3,99 +3,111 @@ export component MainControls inherits Rectangle {
     callback previous-clicked();
     callback play-pause-clicked();
     callback next-clicked();
-    height: 80px;
+    height: 72px;
     HorizontalLayout {
         alignment: center;
         spacing: 24px;
         
         // Previous button
-        prev-button := Rectangle {
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            Image {
-                source: @image-url("../../../resources/icons/rewind.svg");
-                width: 32px;
-                height: 32px;
-                colorize: #9ca3af;
-            }
+        Rectangle {
+            height: parent.height;
+            preferred-width: parent.height;
+            prev-button := Rectangle {
+                width: 52px;
+                height: 52px;
+                border-radius: 26px;
+                Image {
+                    source: @image-url("../../../resources/icons/rewind.svg");
+                    width: 32px;
+                    height: 32px;
+                    colorize: #9ca3af;
+                }
 
-            prev-touch := TouchArea {
-                clicked => {
-                    root.previous-clicked();
+                prev-touch := TouchArea {
+                    clicked => {
+                        root.previous-clicked();
+                    }
                 }
-            }
 
-            states [
-                pressed when prev-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when prev-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
+                states [
+                    pressed when prev-touch.pressed: {
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    hovered when prev-touch.has-hover: {
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                ]
+            }
         }
-        
+
+        Rectangle {
+            height: parent.height;
+            preferred-width: parent.height;
         // Play/Pause button
         play-button := Rectangle {
-            width: 72px;
-            height: 72px;
-            background: rgba(107, 114, 128, 0.5);
-            border-radius: 36px;
-            if root.is-playing: Image {
-                source: @image-url("../../../resources/icons/pause.svg");
-                width: 32px;
-                height: 32px;
-                colorize: white;
-            }
-            if !root.is-playing: Image {
-                source: @image-url("../../../resources/icons/play.svg");
-                width: 32px;
-                height: 32px;
-                colorize: white;
-            }
-            play-touch := TouchArea {
-                clicked => {
-                    root.play-pause-clicked();
+                width: 72px;
+                height: 72px;
+                background: rgba(107, 114, 128, 0.5);
+                border-radius: 36px;
+                if root.is-playing: Image {
+                    source: @image-url("../../../resources/icons/pause.svg");
+                    width: 32px;
+                    height: 32px;
+                    colorize: white;
                 }
-            }
+                if !root.is-playing: Image {
+                    source: @image-url("../../../resources/icons/play.svg");
+                    width: 32px;
+                    height: 32px;
+                    colorize: white;
+                }
+                play-touch := TouchArea {
+                    clicked => {
+                        root.play-pause-clicked();
+                    }
+                }
 
-            states [
-                pressed when play-touch.pressed: {
-                    background: rgba(107, 114, 128, 0.7);
-                }
-                hovered when play-touch.has-hover: {
-                    background: rgba(107, 114, 128, 0.6);
-                }
-            ]
+                states [
+                    pressed when play-touch.pressed: {
+                        background: rgba(107, 114, 128, 0.7);
+                    }
+                    hovered when play-touch.has-hover: {
+                        background: rgba(107, 114, 128, 0.6);
+                    }
+                ]
+            }
         }
-        
+
+        Rectangle {
+            height: parent.height;
+            preferred-width: parent.height;
         // Next button
         next-button := Rectangle {
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            Image {
-                source: @image-url("../../../resources/icons/fast-forward.svg");
-                width: 32px;
-                height: 32px;
-                colorize: #9ca3af;
-            }
+                width: 52px;
+                height: 52px;
+                border-radius: 26px;
+                Image {
+                    source: @image-url("../../../resources/icons/fast-forward.svg");
+                    width: 32px;
+                    height: 32px;
+                    colorize: #9ca3af;
+                }
 
-            next-touch := TouchArea {
-                clicked => {
-                    root.next-clicked();
+                next-touch := TouchArea {
+                    clicked => {
+                        root.next-clicked();
+                    }
                 }
-            }
 
-            states [
-                pressed when next-touch.pressed: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                hovered when next-touch.has-hover: {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-            ]
+                states [
+                    pressed when next-touch.pressed: {
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    hovered when next-touch.has-hover: {
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                ]
+            }
         }
     }
 }
