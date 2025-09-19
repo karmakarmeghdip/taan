@@ -56,42 +56,34 @@ export component MusicPlayer inherits Window {
                 // Handle seek to position
                 debug("Seeking to: ", value);
             }
-            
             volume-changed(value) => {
                 // Handle volume change
                 debug("Volume changed to: ", value);
             }
-            
             previous-clicked => {
                 // Handle previous track
                 debug("Previous clicked");
             }
-            
             play-pause-clicked => {
                 root.is-playing = !root.is-playing;
                 debug("Play/Pause clicked, now: ", root.is-playing);
             }
-            
             next-clicked => {
                 // Handle next track
                 debug("Next clicked");
             }
-            
             stop-clicked => {
                 // Handle stop
                 debug("Stop clicked");
             }
-            
             shuffle-clicked => {
                 // Handle shuffle
                 debug("Shuffle clicked");
             }
-            
             repeat-clicked => {
                 // Handle repeat
                 debug("Repeat clicked");
             }
-            
             playlist-clicked => {
                 // Handle playlist
                 debug("Playlist clicked");
@@ -103,7 +95,6 @@ export component MusicPlayer inherits Window {
     close-button := CloseButton {
         x: parent.width - self.width - 16px;
         y: 16px;
-        
         close-clicked => {
             // Handle close
             debug("Close clicked");
