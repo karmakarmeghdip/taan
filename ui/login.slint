@@ -1,0 +1,103 @@
+import { Colors, Spacing, BorderRadius, Animations } from "components/common/colors.slint";
+import { PrimaryButton, ButtonSize, ButtonShape } from "components/common/button.slint";
+
+export component LoginWindow inherits Window {
+    title: "Login - Taan";
+    preferred-width: 384px;
+    preferred-height: 480px;
+    min-width: 340px;
+    min-height: 480px;
+    
+    // Properties for login state
+    property <bool> login-in-progress: false;
+    
+    // Callback for login button click
+    callback login-clicked();
+    
+    // Background - using the centralized color system to match player gradient
+    background: Colors.background-primary;
+    
+    // Main content container - center everything properly
+    VerticalLayout {
+        padding: Spacing.xxl;
+        spacing: Spacing.xl;
+        alignment: center;
+        Rectangle {
+            Image {
+                source: @image-url("../resources/icons/audio-waveform.svg");
+                width: 64px;
+                height: 64px;
+                colorize: Colors.text-secondary;
+            }
+        }
+            
+        // App title
+        Text {
+            text: "Taan";
+            font-size: 48px;
+            font-weight: 800;
+            color: Colors.text-primary;
+            horizontal-alignment: center;
+        }
+
+        Text {
+            text: "A native, blazingly fast Spotify client.";
+            font-size: 16px;
+            color: Colors.text-secondary;
+            horizontal-alignment: center;
+        }
+
+        Text {
+            text: "Lightweight, using 10x fewer resources.";
+            font-size: 14px;
+            color: Colors.text-muted;
+            horizontal-alignment: center;
+        }
+        
+        
+        // Login button using PrimaryButton component
+        
+            login-button := PrimaryButton {
+            enabled: !root.login-in-progress;
+            width: 100%;
+            height: 48px;
+            clicked => {
+                root.login-clicked();
+            }
+            Rectangle {
+                width: 100%;
+                height: 48px;
+                border-radius: BorderRadius.full;
+            
+            // Override button states for Spotify branding
+            states [
+                    disabled when root.login-in-progress: {
+                        opacity: Colors.opacity-disabled;
+                    }
+                ]
+                animate background { duration: Animations.normal; }
+                HorizontalLayout {
+                    spacing: Spacing.md;
+                    alignment: center;
+                    Rectangle {
+                        Image {
+                            source: @image-url("../resources/icons/spotify.svg");
+                            width: 24px;
+                            height: 24px;
+                            colorize: Colors.text-primary;
+                        }
+                    }
+
+                    Rectangle {
+                        Text {
+                            text: "Login with Spotify";
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: Colors.text-primary;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
