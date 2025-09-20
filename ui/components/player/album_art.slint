@@ -3,11 +3,10 @@ export component AlbumArt inherits Rectangle {
     
     // Center the album art within available space
     album-art := Rectangle {
-        // Use a fixed maximum size to prevent layout loops
-        width: min(300px, parent.width - 48px); // Account for margins
-        height: min(300px, parent.height - 56px); // Account for top/bottom margins (40px + 16px)
-        x: (parent.width - self.width) / 2;
-        y: 40px + (parent.height - 56px - self.height) / 2; // 40px top margin + center in remaining space
+        // Make it square while keeping it responsive
+        // Calculate square size based on available space, with a maximum of 300px
+        width: min(300px, min(root.width - 48px, root.height - 56px));
+        height: self.width; // Same as width to make it square
         border-radius: 8px;
         clip: true;
         Image {

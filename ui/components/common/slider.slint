@@ -25,6 +25,7 @@ export component Slider inherits Rectangle {
         
         // Slider fill (progress)
         slider-fill := Rectangle {
+            x: 0; // Anchor the fill to the left
             width: parent.width * root.value;
             height: parent.height;
             background: Colors.slider-fill;
@@ -97,7 +98,7 @@ export component ProgressBar inherits Rectangle {
     
     height: 20px;
     HorizontalLayout {
-        alignment: center;
+        alignment: LayoutAlignment.stretch;
         spacing: Spacing.sm;
         
         // Current time
@@ -112,7 +113,6 @@ export component ProgressBar inherits Rectangle {
         
         // Progress slider
         progress-slider := Slider {
-            horizontal-stretch: 1;
             value <=> root.progress;
             track-height: 4px;
             handle-size: 12px;
@@ -144,33 +144,41 @@ export component VolumeSlider inherits Rectangle {
     height: 24px;
     HorizontalLayout {
         spacing: Spacing.md;
-        alignment: center;
-        
-        // Volume low icon
-        volume-low-icon := Image {
-            source: @image-url("../../../resources/icons/volume-1.svg");
-            width: 16px;
-            height: 16px;
-            colorize: Colors.icon-secondary;
-        }
-        
-        // Volume slider
-        volume-slider := Slider {
-            horizontal-stretch: 1;
-            value <=> root.volume;
-            track-height: 4px;
-            handle-size: 8px;
-            value-changed(new-value) => {
-                root.volume-changed(new-value);
+        alignment: stretch;
+        Rectangle {
+            height: parent.height;
+            // Volume low icon
+            volume-low-icon := Image {
+                source: @image-url("../../../resources/icons/volume-1.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
             }
         }
-        
+
+        Rectangle {
+            height: parent.height;
+        // Volume slider
+        volume-slider := Slider {
+                horizontal-stretch: 1;
+                value <=> root.volume;
+                track-height: 4px;
+                handle-size: 8px;
+                value-changed(new-value) => {
+                    root.volume-changed(new-value);
+                }
+            }
+        }
+
+        Rectangle {
+            height: parent.height;
         // Volume high icon
         volume-high-icon := Image {
-            source: @image-url("../../../resources/icons/volume-2.svg");
-            width: 16px;
-            height: 16px;
-            colorize: Colors.icon-secondary;
+                source: @image-url("../../../resources/icons/volume-2.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
+            }
         }
     }
 }
