@@ -3,16 +3,7 @@ import { PlayerControls } from "components/player/player_controls.slint";
 import { CloseButton } from "components/player/close_button.slint";
 import { Colors } from "components/common/colors.slint";
 
-export component MusicPlayer inherits Window {
-    title: "Music Player";
-    // Player dimensions - matching HTML defaults
-    preferred-width: 384px;
-    preferred-height: 672px;
-    
-    // Resizable constraints - matching HTML
-    min-width: 300px;
-    min-height: 500px;
-    
+export component MusicPlayer {
     // Properties for player state
     property <string> song-title: "Albireo";
     property <string> artist-name: "Rokudenashi";
@@ -24,18 +15,16 @@ export component MusicPlayer inherits Window {
     property <float> volume: 0.7; // 0.0 to 1.0
     property <bool> is-playing: false;
     
-    // Background - using the centralized color system
-    background: Colors.background-primary;
     
     // Main layout - vertical with album art area that grows and controls area that's fixed
-    VerticalLayout {
+    HorizontalLayout {
         padding: 0px;
         spacing: 0px;
         
         // Album art section (flex-grow equivalent)
         album-art-container := Rectangle {
-            vertical-stretch: 1; // This makes it grow to fill available space
-            
+            // vertical-stretch: 1; // This makes it grow to fill available space
+            horizontal-stretch: 0;
             album-art := AlbumArt {
                 album-art-url: root.album-art-url;
             }
@@ -92,13 +81,13 @@ export component MusicPlayer inherits Window {
         }
     }
     
-    // Close button (positioned absolutely in top-right)
-    close-button := CloseButton {
-        x: parent.width - self.width - 16px;
-        y: 16px;
-        close-clicked => {
-            // Handle close
-            debug("Close clicked");
-        }
-    }
+    // // Close button (positioned absolutely in top-right)
+    // close-button := CloseButton {
+    //     x: parent.width - self.width - 16px;
+    //     y: 16px;
+    //     close-clicked => {
+    //         // Handle close
+    //         debug("Close clicked");
+    //     }
+    // }
 }

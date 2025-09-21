@@ -4,7 +4,7 @@ mod spotify;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rt = setup_rt()?;
-    let spot = rt.block_on(async { spotify::SpotifyState::default() });
+    let _spot = rt.block_on(async { spotify::SpotifyState::default() });
     let ui = MainWindow::new()?;
 
     ui.run()?;

@@ -28,18 +28,15 @@ export component PlayerControls inherits Rectangle {
     vertical-stretch: 0; // Fixed size, won't shrink
     
     VerticalLayout {
-        alignment: center;
+        alignment: LayoutAlignment.stretch;
         padding: 24px;
-        padding-top: 8px;
+        padding-top: 72px;
         spacing: 16px;
-        
-        // Progress bar section
-        progress-bar := ProgressBar {
-            progress <=> root.progress;
-            current-time: root.current-time;
-            remaining-time: root.remaining-time;
-            seek(value) => {
-                root.seek(value);
+        // Volume control section
+        volume-slider := VolumeSlider {
+            volume <=> root.volume;
+            volume-changed(value) => {
+                root.volume-changed(value);
             }
         }
         
@@ -64,11 +61,14 @@ export component PlayerControls inherits Rectangle {
             }
         }
         
-        // Volume control section
-        volume-slider := VolumeSlider {
-            volume <=> root.volume;
-            volume-changed(value) => {
-                root.volume-changed(value);
+        
+        // Progress bar section
+        progress-bar := ProgressBar {
+            progress <=> root.progress;
+            current-time: root.current-time;
+            remaining-time: root.remaining-time;
+            seek(value) => {
+                root.seek(value);
             }
         }
         

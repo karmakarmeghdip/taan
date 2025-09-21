@@ -1,12 +1,7 @@
 import { Colors, Spacing, BorderRadius, Animations } from "components/common/colors.slint";
 import { PrimaryButton, ButtonSize, ButtonShape } from "components/common/button.slint";
 
-export component LoginWindow inherits Window {
-    title: "Login - Taan";
-    preferred-width: 384px;
-    preferred-height: 480px;
-    min-width: 340px;
-    min-height: 480px;
+export component LoginWindow {
     
     // Properties for login state
     property <bool> login-in-progress: false;
@@ -14,8 +9,6 @@ export component LoginWindow inherits Window {
     // Callback for login button click
     callback login-clicked();
     
-    // Background - using the centralized color system to match player gradient
-    background: Colors.background-primary;
     
     // Main content container - center everything properly
     VerticalLayout {

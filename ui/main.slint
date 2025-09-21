@@ -1,8 +1,21 @@
 import { MusicPlayer } from "player.slint";
 import { LoginWindow } from "login.slint";
+import { Colors } from "components/common/colors.slint";
+import "../resources/fonts/Inter-Regular.ttf";
 
-// Export the MusicPlayer directly as MainWindow since it now inherits from Window
-export { MusicPlayer as MainWindow }
-
-// Also export LoginWindow for use in authentication flow
-export { LoginWindow }
+export component MainWindow inherits Window {
+    title: "Taan";
+    min-width: 672px;
+    min-height: 300px;
+    background: Colors.background-primary;
+    default-font-family: "Inter";
+    in property <bool> loggedIn: true;
+    if loggedIn: MusicPlayer {
+        preferred-width: parent.width;
+        preferred-height: parent.height;
+    }
+    if !loggedIn: LoginWindow {
+        preferred-width: parent.width;
+        preferred-height: parent.height;
+    }
+}
