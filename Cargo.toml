@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "taan_android"
-crate-type = ["cdylib"]
+name = "taan_lib"
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 librespot-core = "0.7.1"
@@ -14,12 +14,13 @@ librespot-playback = "0.7.1"
 librespot-metadata = "0.7.1"
 rspotify = "0.15.1"
 chrono = "0.4.42"
-slint = "1.13.1"
+slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
 tokio = { version = "1", features = ["full"] }
+anyhow = "1.0.100"
 
 [target.'cfg(target_os = "android")'.dependencies]
 slint = { version = "1.13.1", features = ["backend-android-activity-06"] }
-openssl-sys = { version = "0.9.109", features = [ "vendored" ] }
+openssl-sys = { version = "0.9.109", features = ["vendored"] }
 
 [build-dependencies]
 slint-build = "1.13.1"

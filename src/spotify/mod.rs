@@ -53,9 +53,8 @@ pub struct SpotifyState {
     player: Arc<Player>,
     client: AuthCodeSpotify,
 }
-
 impl Default for SpotifyState {
-    fn default() -> Self {
+    fn default() -> SpotifyState {
         let cache = Cache::new(Some(CACHE), Some(CACHE), Some(CACHE_FILES), None)
             .expect("Failed to initalise cache, fatal");
         let session = Session::new(SessionConfig::default(), Some(cache));
@@ -80,19 +79,24 @@ impl Default for SpotifyState {
     }
 }
 impl SpotifyState {
-    pub async fn connect(&self, creds: Credentials) -> Result<(), Error> {
+    pub async fn init(&self) -> anyhow::Result<()> {
+        let creds = self
+            .session
+            .cache()
+            .ok_or(Error::unauthenticated("No cache in session"))?
+            .credentials()
+            .ok_or(Error::unauthenticated("No cache in session"))?;
         self.session.connect(creds, true).await?;
-        self.web_auth().await;
+        Ok(())
+    }
+    pub async fn connect(&self, creds: Credentials) -> anyhow::Result<()> {
+        self.session.connect(creds, true).await?;
+        self.web_auth().await?;
         Ok(())
     }
 
-    pub async fn web_auth(&self) {
-        let token = self
-            .session
-            .login5()
-            .auth_token()
-            .await
-            .expect("Not Logged in");
+    pub async fn web_auth(&self) -> anyhow::Result<()> {
+        let token = self.session.login5().auth_token().await?;
 
         let rtoken = rspotify::Token {
             access_token: token.access_token,
@@ -103,6 +107,7 @@ impl SpotifyState {
         };
 
         *self.client.token.lock().await.unwrap() = Some(rtoken);
+        Ok(())
     }
 
     pub async fn get_me(&self) -> Result<rspotify::model::PrivateUser, Error> {
@@ -187,7 +192,9 @@ impl SpotifyState {
         .await
         .map(|t| Credentials::with_access_token(t.access_token))
         .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
-        self.connect(c).await?;
+        self.connect(c)
+            .await
+            .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
         Ok(())
     }
     async fn requires_refresh(&self, e: ClientError) -> bool {
