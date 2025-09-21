@@ -1,0 +1,61 @@
+// Core application state management
+// This global manages overall app lifecycle, authentication, and navigation
+
+export global AppState {
+    // === AUTHENTICATION STATE ===
+    in-out property <bool> is-logged-in: false;
+    in-out property <string> user-id: "";
+    in-out property <string> username: "";
+    in-out property <string> display-name: "";
+    in-out property <string> user-email: "";
+    in-out property <string> user-country: "";
+    in-out property <bool> has-premium: false;
+    
+    // === APP LIFECYCLE ===
+    in-out property <bool> app-initialized: false;
+    in-out property <bool> login-in-progress: false;
+    in-out property <string> last-error: "";
+    in-out property <int> error-count: 0;
+    
+    // === NAVIGATION STATE ===
+    in-out property <string> current-view: "login"; // "login", "player", "settings", "playlists"
+    in-out property <string> previous-view: "";
+    
+    // === APP SETTINGS ===
+    in-out property <bool> start-minimized: false;
+    in-out property <bool> close-to-tray: true;
+    in-out property <bool> auto-login: true;
+    in-out property <bool> remember-window-state: true;
+    
+    // === CALLBACKS FOR NATIVE INTEGRATION ===
+    
+    // Authentication callbacks
+    pure callback request-login() -> bool;
+    pure callback request-logout() -> bool;
+    pure callback refresh-auth-token() -> bool;
+    
+    // Navigation callbacks  
+    pure callback navigate-to(string /* view-name */) -> bool;
+    pure callback can-navigate-back() -> bool;
+    pure callback navigate-back() -> bool;
+    
+    // App lifecycle callbacks
+    pure callback initialize-app() -> bool;
+    pure callback shutdown-app() -> bool;
+    pure callback minimize-to-tray() -> bool;
+    pure callback restore-from-tray() -> bool;
+    
+    // Error handling
+    pure callback clear-error() -> bool;
+    pure callback report-error(string /* error-message */) -> bool;
+    
+    // Settings persistence
+    pure callback save-settings() -> bool;
+    pure callback load-settings() -> bool;
+    
+    // === DERIVED PROPERTIES ===
+    out property <bool> should-show-player: is-logged-in && current-view == "player";
+    out property <bool> should-show-login: !is-logged-in || current-view == "login";
+    out property <bool> has-error: last-error != "";
+    out property <bool> is-ready: app-initialized && !login-in-progress;
+}

@@ -1,0 +1,127 @@
+// UI state management
+// This global manages window state, themes, UI preferences, and view-specific state
+
+export global UIState {
+    // === WINDOW STATE ===
+    in-out property <int> window-width: 672;
+    in-out property <int> window-height: 300;
+    in-out property <int> window-x: 100;
+    in-out property <int> window-y: 100;
+    in-out property <bool> is-maximized: false;
+    in-out property <bool> is-minimized: false;
+    in-out property <bool> is-fullscreen: false;
+    in-out property <bool> always-on-top: false;
+    
+    // === THEME AND APPEARANCE ===
+    in-out property <string> current-theme: "dark"; // "dark", "light", "auto"
+    in-out property <float> ui-scale: 1.0;
+    in-out property <string> font-family: "Inter";
+    in-out property <int> font-size: 14;
+    in-out property <bool> use-system-theme: true;
+    in-out property <bool> reduce-animations: false;
+    
+    // === PLAYER UI STATE ===
+    in-out property <bool> show-album-art: true;
+    in-out property <bool> show-track-info: true;
+    in-out property <bool> show-progress-bar: true;
+    in-out property <bool> show-volume-control: true;
+    in-out property <bool> show-additional-controls: true;
+    in-out property <bool> compact-mode: false;
+    in-out property <string> player-layout: "default"; // "default", "compact", "mini"
+    
+    // === SIDEBAR AND NAVIGATION ===
+    in-out property <bool> sidebar-visible: true;
+    in-out property <int> sidebar-width: 240;
+    in-out property <bool> sidebar-collapsed: false;
+    in-out property <string> active-sidebar-section: "library"; // "library", "playlists", "search"
+    
+    // === MODALS AND POPUPS ===
+    in-out property <bool> settings-modal-open: false;
+    in-out property <bool> about-modal-open: false;
+    in-out property <bool> playlist-modal-open: false;
+    in-out property <bool> search-modal-open: false;
+    in-out property <string> active-modal: ""; // "", "settings", "about", "playlist", "search"
+    
+    // === NOTIFICATIONS AND MESSAGES ===
+    in-out property <string> notification-message: "";
+    in-out property <string> notification-type: "info"; // "info", "success", "warning", "error"
+    in-out property <bool> notification-visible: false;
+    in-out property <int> notification-timeout: 3000; // milliseconds
+    
+    // === LOADING AND PROGRESS STATES ===
+    in-out property <bool> is-loading: false;
+    in-out property <string> loading-message: "";
+    in-out property <float> loading-progress: 0.0; // 0.0 to 1.0
+    in-out property <bool> show-loading-spinner: false;
+    
+    // === KEYBOARD AND ACCESSIBILITY ===
+    in-out property <bool> keyboard-navigation-enabled: true;
+    in-out property <bool> screen-reader-enabled: false;
+    in-out property <bool> high-contrast-mode: false;
+    in-out property <bool> focus-visible: true;
+    
+    // === VIEW-SPECIFIC STATE ===
+    
+    // Search view
+    in-out property <string> search-query: "";
+    in-out property <string> search-filter: "all"; // "all", "tracks", "artists", "albums", "playlists"
+    in-out property <bool> search-results-visible: false;
+    
+    // Library view
+    in-out property <string> library-sort-by: "recently-added"; // "name", "artist", "album", "recently-added"
+    in-out property <bool> library-sort-ascending: true;
+    in-out property <string> library-view-mode: "list"; // "list", "grid", "compact"
+    
+    // Playlist view
+    in-out property <string> selected-playlist-id: "";
+    in-out property <bool> playlist-edit-mode: false;
+    
+    // === DERIVED PROPERTIES ===
+    property <bool> is-dark-theme: current-theme == "dark" || (current-theme == "auto" && use-system-theme);
+    property <bool> has-notification: notification-message != "";
+    property <bool> any-modal-open: active-modal != "";
+    property <bool> is-compact: compact-mode || player-layout == "compact" || player-layout == "mini";
+    
+    // === UI CALLBACKS ===
+    
+    // Window management
+    pure callback toggle-maximized() -> bool;
+    pure callback toggle-fullscreen() -> bool;
+    pure callback minimize-window() -> bool;
+    pure callback restore-window() -> bool;
+    pure callback set-always-on-top(bool /* enabled */) -> bool;
+    
+    // Theme management
+    pure callback set-theme(string /* theme-name */) -> bool;
+    pure callback toggle-theme() -> bool;
+    pure callback apply-system-theme() -> bool;
+    
+    // UI state management
+    pure callback toggle-sidebar() -> bool;
+    pure callback set-sidebar-section(string /* section */) -> bool;
+    pure callback toggle-compact-mode() -> bool;
+    pure callback set-player-layout(string /* layout */) -> bool;
+    
+    // Modal management
+    pure callback show-modal(string /* modal-name */) -> bool;
+    pure callback hide-modal() -> bool;
+    pure callback hide-all-modals() -> bool;
+    
+    // Notification management
+    pure callback show-notification(string /* message */, string /* type */) -> bool;
+    pure callback hide-notification() -> bool;
+    pure callback clear-notifications() -> bool;
+    
+    // Loading state management
+    pure callback show-loading(string /* message */) -> bool;
+    pure callback hide-loading() -> bool;
+    pure callback update-loading-progress(float /* progress */) -> bool;
+    
+    // Keyboard shortcuts
+    pure callback handle-keyboard-shortcut(string /* key-combination */) -> bool;
+    pure callback toggle-keyboard-navigation() -> bool;
+    
+    // Accessibility
+    pure callback toggle-high-contrast() -> bool;
+    pure callback announce-to-screen-reader(string /* message */) -> bool;
+}

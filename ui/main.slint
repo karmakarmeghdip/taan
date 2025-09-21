@@ -1,21 +1,34 @@
 import { MusicPlayer } from "player.slint";
 import { LoginWindow } from "login.slint";
 import { Colors } from "components/common/colors.slint";
+import { AppState, PlayerState, SpotifyAPI, UIState } from "state/mod.slint";
 import "../resources/fonts/Inter-Regular.ttf";
+
+// Re-export globals for native access (recommended approach)
+export { AppState, PlayerState, SpotifyAPI, UIState }
 
 export component MainWindow inherits Window {
     title: "Taan";
-    min-width: 672px;
-    min-height: 300px;
+    min-width: UIState.window-width * 1px;
+    min-height: UIState.window-height * 1px;
     background: Colors.background-primary;
-    default-font-family: "Inter";
-    in property <bool> loggedIn: true;
-    if loggedIn: MusicPlayer {
+    default-font-family: UIState.font-family;
+    
+    
+    // === MAIN UI LOGIC ===
+    
+    // Show appropriate view based on authentication state
+    if !AppState.is-logged-in || AppState.current-view == "login": LoginWindow {
         preferred-width: parent.width;
         preferred-height: parent.height;
     }
-    if !loggedIn: LoginWindow {
+    if AppState.is-logged-in && AppState.current-view == "player": MusicPlayer {
         preferred-width: parent.width;
         preferred-height: parent.height;
+    }
+    
+    // Initialize app on startup
+    init => {
+        AppState.initialize-app();
     }
 }

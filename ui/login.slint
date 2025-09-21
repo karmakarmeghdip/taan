@@ -1,14 +1,10 @@
 import { Colors, Spacing, BorderRadius, Animations } from "components/common/colors.slint";
 import { PrimaryButton, ButtonSize, ButtonShape } from "components/common/button.slint";
+import { AppState, SpotifyAPI } from "state/mod.slint";
 
 export component LoginWindow {
     
-    // Properties for login state
-    property <bool> login-in-progress: false;
-    
-    // Callback for login button click
-    callback login-clicked();
-    
+    // All authentication state is now managed globally through AppState
     
     // Main content container - center everything properly
     VerticalLayout {
@@ -49,22 +45,22 @@ export component LoginWindow {
         
         
         // Login button using PrimaryButton component
-        
-            login-button := PrimaryButton {
-            enabled: !root.login-in-progress;
+        login-button := PrimaryButton {
+            enabled: !AppState.login-in-progress;
             width: 100%;
             height: 48px;
             clicked => {
-                root.login-clicked();
+                // Trigger OAuth login through global state
+                SpotifyAPI.start-oauth-login();
             }
             Rectangle {
                 width: 100%;
                 height: 48px;
                 border-radius: BorderRadius.full;
             
-            // Override button states for Spotify branding
-            states [
-                    disabled when root.login-in-progress: {
+                // Override button states for Spotify branding
+                states [
+                    disabled when AppState.login-in-progress: {
                         opacity: Colors.opacity-disabled;
                     }
                 ]
@@ -83,7 +79,7 @@ export component LoginWindow {
 
                     Rectangle {
                         Text {
-                            text: "Login with Spotify";
+                            text: AppState.login-in-progress ? "Logging in..." : "Login with Spotify";
                             font-size: 18px;
                             font-weight: 700;
                             color: Colors.text-primary;
@@ -91,6 +87,14 @@ export component LoginWindow {
                     }
                 }
             }
+        }
+        
+        // Error message display
+        if AppState.has-error: Text {
+            text: AppState.last-error;
+            color: Colors.error;
+            font-size: 14px;
+            horizontal-alignment: center;
         }
     }
 }

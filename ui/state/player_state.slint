@@ -1,0 +1,104 @@
+// Music player state management
+// This global manages current track, playback state, and player controls
+
+export global PlayerState {
+    // === CURRENT TRACK INFO ===
+    in-out property <string> track-id: "";
+    in-out property <string> track-title: "No Track Playing";
+    in-out property <string> track-artist: "";
+    in-out property <string> track-album: "";
+    in-out property <string> track-composer: "";
+    in-out property <string> album-art-url: "";
+    in-out property <int> track-duration-ms: 0; // Total duration in milliseconds
+    in-out property <int> track-position-ms: 0; // Current position in milliseconds
+    
+    // === PLAYBACK STATE ===
+    in-out property <bool> is-playing: false;
+    in-out property <bool> is-paused: false;
+    in-out property <bool> is-stopped: true;
+    in-out property <bool> is-loading: false;
+    in-out property <bool> is-shuffled: false;
+    in-out property <string> repeat-mode: "off"; // "off", "track", "context"
+    
+    // === AUDIO SETTINGS ===
+    in-out property <float> volume: 0.7; // 0.0 to 1.0
+    in-out property <bool> is-muted: false;
+    in-out property <float> previous-volume: 0.7; // For mute/unmute
+    
+    // === QUEUE AND CONTEXT ===
+    in-out property <string> current-context-uri: ""; // playlist, album, etc.
+    in-out property <string> current-context-name: "";
+    in-out property <bool> has-previous-track: false;
+    in-out property <bool> has-next-track: false;
+    in-out property <int> queue-length: 0;
+    in-out property <int> current-track-index: 0;
+    
+    // === PLAYER DEVICE INFO ===
+    in-out property <string> device-id: "";
+    in-out property <string> device-name: "Taan Player";
+    in-out property <bool> device-is-active: false;
+    in-out property <bool> device-is-restricted: false;
+    
+    // === DERIVED PROPERTIES ===
+    out property <float> progress: track-duration-ms > 0 ? track-position-ms / track-duration-ms : 0.0;
+    out property <string> current-time: format-time(track-position-ms);
+    out property <string> remaining-time: format-time(track-duration-ms - track-position-ms);
+    out property <string> total-time: format-time(track-duration-ms);
+    out property <bool> has-track: track-id != "";
+    out property <bool> can-control: has-track && device-is-active && !device-is-restricted;
+    
+    // === PLAYBACK CONTROL CALLBACKS ===
+    
+    // Basic controls
+    pure callback play() -> bool;
+    pure callback pause() -> bool;
+    pure callback stop() -> bool;
+    pure callback toggle-play-pause() -> bool;
+    pure callback previous-track() -> bool;
+    pure callback next-track() -> bool;
+    
+    // Seeking
+    pure callback seek-to-position(float /* progress 0.0-1.0 */) -> bool;
+    pure callback seek-to-ms(int /* position in milliseconds */) -> bool;
+    pure callback seek-forward(int /* seconds */) -> bool;
+    pure callback seek-backward(int /* seconds */) -> bool;
+    
+    // Volume controls
+    pure callback set-volume(float /* volume 0.0-1.0 */) -> bool;
+    pure callback toggle-mute() -> bool;
+    pure callback volume-up() -> bool;
+    pure callback volume-down() -> bool;
+    
+    // Playback mode controls
+    pure callback toggle-shuffle() -> bool;
+    pure callback cycle-repeat() -> bool; // off -> track -> context -> off
+    pure callback set-repeat-mode(string /* mode */) -> bool;
+    
+    // Queue management
+    pure callback clear-queue() -> bool;
+    pure callback add-to-queue(string /* track-uri */) -> bool;
+    pure callback remove-from-queue(int /* index */) -> bool;
+    
+    // === UTILITY CALLBACKS ===
+    
+    // Time formatting helper
+    pure callback format-time(int /* milliseconds */) -> string;
+    
+    // Track info updates (called by native code)
+    pure callback update-track-info(string, /* track-id */
+        string, /* title */
+        string, /* artist */ 
+        string, /* album */
+        string, /* album-art-url */
+        int     /* duration-ms */
+    ) -> bool;
+    
+    // Position updates (called frequently by native code)
+    pure callback update-position(int /* position-ms */) -> bool;
+    
+    // Playback state updates
+    pure callback update-playback-state(bool,   /* is-playing */
+        bool,   /* is-shuffled */
+        string  /* repeat-mode */
+    ) -> bool;
+}

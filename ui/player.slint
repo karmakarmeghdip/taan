@@ -2,80 +2,63 @@ import { AlbumArt } from "components/player/album_art.slint";
 import { PlayerControls } from "components/player/player_controls.slint";
 import { CloseButton } from "components/player/close_button.slint";
 import { Colors } from "components/common/colors.slint";
+import { PlayerState } from "state/mod.slint";
 
 export component MusicPlayer {
-    // Properties for player state
-    property <string> song-title: "Albireo";
-    property <string> artist-name: "Rokudenashi";
-    property <string> composer: "ナユタン星人";
-    property <string> album-art-url: "https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94";
-    property <float> progress: 0.25; // 0.0 to 1.0
-    property <string> current-time: "0:19";
-    property <string> remaining-time: "-3:46";
-    property <float> volume: 0.7; // 0.0 to 1.0
-    property <bool> is-playing: false;
+    // All player state is now managed globally through PlayerState
     
-    
-    // Main layout - vertical with album art area that grows and controls area that's fixed
+    // Main layout - horizontal with album art area and controls area
     HorizontalLayout {
         padding: 0px;
         spacing: 0px;
         
-        // Album art section (flex-grow equivalent)
+        // Album art section
         album-art-container := Rectangle {
-            // vertical-stretch: 1; // This makes it grow to fill available space
             horizontal-stretch: 0;
             album-art := AlbumArt {
-                album-art-url: root.album-art-url;
+                album-art-url: PlayerState.album-art-url;
             }
         }
         
-        // Controls section (fixed height - equivalent to flex-shrink: 0)
+        // Controls section
         player-controls := PlayerControls {
-            song-title: root.song-title;
-            artist-name: root.artist-name;
-            composer: root.composer;
-            progress <=> root.progress;
-            current-time: root.current-time;
-            remaining-time: root.remaining-time;
-            volume <=> root.volume;
-            is-playing <=> root.is-playing;
+            // Bind to global player state
+            song-title: PlayerState.track-title;
+            artist-name: PlayerState.track-artist;
+            composer: PlayerState.track-composer;
+            progress: PlayerState.progress;
+            current-time: PlayerState.current-time;
+            remaining-time: PlayerState.remaining-time;
+            volume <=> PlayerState.volume;
+            is-playing <=> PlayerState.is-playing;
             
-            // Forward all callbacks
+            // Forward all callbacks to global state
             seek(value) => {
-                // Handle seek to position
-                debug("Seeking to: ", value);
+                PlayerState.seek-to-position(value);
             }
             volume-changed(value) => {
-                // Handle volume change
-                debug("Volume changed to: ", value);
+                PlayerState.set-volume(value);
             }
             previous-clicked => {
-                // Handle previous track
-                debug("Previous clicked");
+                PlayerState.previous-track();
             }
             play-pause-clicked => {
-                root.is-playing = !root.is-playing;
-                debug("Play/Pause clicked, now: ", root.is-playing);
+                PlayerState.toggle-play-pause();
             }
             next-clicked => {
-                // Handle next track
-                debug("Next clicked");
+                PlayerState.next-track();
             }
             stop-clicked => {
-                // Handle stop
-                debug("Stop clicked");
+                PlayerState.stop();
             }
             shuffle-clicked => {
-                // Handle shuffle
-                debug("Shuffle clicked");
+                PlayerState.toggle-shuffle();
             }
             repeat-clicked => {
-                // Handle repeat
-                debug("Repeat clicked");
+                PlayerState.cycle-repeat();
             }
             playlist-clicked => {
-                // Handle playlist
+                // Handle playlist view
                 debug("Playlist clicked");
             }
         }
