@@ -170,10 +170,15 @@ impl SpotifyState {
         }
     }
 
-    pub fn play_track(&self, id: String) -> Result<(), Error> {
+    pub fn load_track(&self, id: String) -> Result<(), Error> {
         let track_id = SpotifyId::from_uri(&id)?;
-        self.player.load(track_id, true, 0);
+        self.player.load(track_id, false, 0);
+        println!("Loaded track {}", id);
         Ok(())
+    }
+
+    pub fn play(&self) {
+        self.player.play();
     }
     pub fn pause(&self) {
         self.player.pause();

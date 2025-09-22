@@ -1,10 +1,8 @@
 import { Colors, Spacing, BorderRadius, Animations } from "components/common/colors.slint";
 import { PrimaryButton, ButtonSize, ButtonShape } from "components/common/button.slint";
-import { AppState, SpotifyAPI } from "state/mod.slint";
+import { AppState } from "state.slint";
 
 export component LoginWindow {
-    
-    // All authentication state is now managed globally through AppState
     
     // Main content container - center everything properly
     VerticalLayout {
@@ -51,7 +49,7 @@ export component LoginWindow {
             height: 48px;
             clicked => {
                 // Trigger OAuth login through global state
-                SpotifyAPI.start-oauth-login();
+                AppState.login-clicked();
             }
             Rectangle {
                 width: 100%;
@@ -89,12 +87,12 @@ export component LoginWindow {
             }
         }
         
-        // Error message display
-        if AppState.has-error: Text {
-            text: AppState.last-error;
-            color: Colors.error;
-            font-size: 14px;
-            horizontal-alignment: center;
-        }
+        // // Error message display
+        // if has-error: Text {
+        //     text: last-error;
+        //     color: Colors.error;
+        //     font-size: 14px;
+        //     horizontal-alignment: center;
+        // }
     }
 }

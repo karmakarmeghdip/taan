@@ -1,0 +1,12 @@
+export global AppState {
+    // Authentication state
+    callback initialize-app();
+    in property <bool> loading: true;
+    in property <bool> loggedIn: false;
+    in property <bool> login-in-progress: false;
+    callback login-clicked();
+    // Player state
+    in property <bool> is-playing: false;
+    callback play();
+    callback pause();
+}

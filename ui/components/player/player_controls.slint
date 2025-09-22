@@ -3,6 +3,7 @@ import { VolumeSlider } from "volume_slider.slint";
 import { SongInfo } from "song_info.slint";
 import { MainControls } from "main_controls.slint";
 import { AdditionalControls } from "additional_controls.slint";
+import { AppState } from "../../state.slint";
 
 export component PlayerControls inherits Rectangle {
     // Properties for player state
@@ -13,7 +14,6 @@ export component PlayerControls inherits Rectangle {
     in-out property <string> current-time: "0:19";
     in-out property <string> remaining-time: "-3:46";
     in-out property <float> volume: 0.7; // 0.0 to 1.0
-    in-out property <bool> is-playing: false;
     
     // Callbacks
     callback seek(float);
@@ -49,12 +49,16 @@ export component PlayerControls inherits Rectangle {
         
         // Main controls section  
         main-controls := MainControls {
-            is-playing: root.is-playing;
+            is-playing: AppState.is-playing;
             previous-clicked => {
                 root.previous-clicked();
             }
             play-pause-clicked => {
-                root.play-pause-clicked();
+                if (AppState.is-playing) {
+                    AppState.pause();
+                } else {
+                    AppState.play();
+                }
             }
             next-clicked => {
                 root.next-clicked();
