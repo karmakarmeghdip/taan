@@ -50,8 +50,8 @@ static OAUTH_SCOPES: &[&str] = &[
 #[derive(Clone)]
 pub struct SpotifyState {
     session: Session,
-    player: Arc<Player>,
-    client: AuthCodeSpotify,
+    pub player: Arc<Player>,
+    client: Arc<AuthCodeSpotify>,
 }
 impl Default for SpotifyState {
     fn default() -> SpotifyState {
@@ -74,7 +74,7 @@ impl Default for SpotifyState {
         SpotifyState {
             session,
             player,
-            client,
+            client: Arc::new(client),
         }
     }
 }
@@ -175,13 +175,6 @@ impl SpotifyState {
         self.player.load(track_id, false, 0);
         println!("Loaded track {}", id);
         Ok(())
-    }
-
-    pub fn play(&self) {
-        self.player.play();
-    }
-    pub fn pause(&self) {
-        self.player.pause();
     }
 
     pub async fn auth(&self) -> Result<(), Error> {

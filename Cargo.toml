@@ -17,6 +17,7 @@ chrono = "0.4.42"
 slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
 tokio = { version = "1", features = ["full"] }
 anyhow = "1.0.100"
+tokio-util = "0.7.16"
 
 [target.'cfg(target_os = "android")'.dependencies]
 slint = { version = "1.13.1", features = ["backend-android-activity-06"] }

@@ -85,7 +85,7 @@ pub fn play(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     let ui = ui.clone_strong();
     app.on_play(move || {
         println!("Playing predefined music for testing");
-        spot.play();
+        spot.player.play();
         let app = ui.global::<crate::AppState>();
         app.set_is_playing(true);
     });
@@ -96,7 +96,7 @@ pub fn pause(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     let ui = ui.clone_strong();
     app.on_pause(move || {
         println!("Pausing music for testing");
-        spot.pause();
+        spot.player.pause();
         let app = ui.global::<crate::AppState>();
         app.set_is_playing(false);
     });
