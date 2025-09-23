@@ -15,7 +15,6 @@ use rspotify::{
     model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
 };
-use xilem::tokio::time::{Instant, sleep_until};
 
 const CACHE: &str = ".cache";
 const CACHE_FILES: &str = ".cache/files";
@@ -48,20 +47,16 @@ static OAUTH_SCOPES: &[&str] = &[
     "user-top-read",
 ];
 
-pub mod async_loop;
-
+#[derive(Clone)]
 pub struct SpotifyState {
     session: Session,
-    creds: Option<Credentials>,
-    player: Arc<Player>,
-    client: AuthCodeSpotify,
+    pub player: Arc<Player>,
+    client: Arc<AuthCodeSpotify>,
 }
-
 impl Default for SpotifyState {
-    fn default() -> Self {
+    fn default() -> SpotifyState {
         let cache = Cache::new(Some(CACHE), Some(CACHE), Some(CACHE_FILES), None)
             .expect("Failed to initalise cache, fatal");
-        let creds = cache.credentials();
         let session = Session::new(SessionConfig::default(), Some(cache));
         let player = Player::new(
             PlayerConfig::default(),
@@ -78,33 +73,30 @@ impl Default for SpotifyState {
         client.config.token_refreshing = false;
         SpotifyState {
             session,
-            creds,
             player,
-            client,
+            client: Arc::new(client),
         }
     }
 }
 impl SpotifyState {
-    pub async fn connect(&self) -> Result<(), Error> {
-        self.session
-            .connect(
-                self.creds
-                    .clone()
-                    .ok_or(Error::unauthenticated("Creds not available"))?,
-                true,
-            )
-            .await?;
-        self.web_auth().await;
+    pub async fn init(&self) -> anyhow::Result<()> {
+        let creds = self
+            .session
+            .cache()
+            .ok_or(Error::unauthenticated("No cache in session"))?
+            .credentials()
+            .ok_or(Error::unauthenticated("No cache in session"))?;
+        self.session.connect(creds, true).await?;
+        Ok(())
+    }
+    pub async fn connect(&self, creds: Credentials) -> anyhow::Result<()> {
+        self.session.connect(creds, true).await?;
+        self.web_auth().await?;
         Ok(())
     }
 
-    pub async fn web_auth(&self) {
-        let token = self
-            .session
-            .login5()
-            .auth_token()
-            .await
-            .expect("Not Logged in");
+    pub async fn web_auth(&self) -> anyhow::Result<()> {
+        let token = self.session.login5().auth_token().await?;
 
         let rtoken = rspotify::Token {
             access_token: token.access_token,
@@ -115,6 +107,7 @@ impl SpotifyState {
         };
 
         *self.client.token.lock().await.unwrap() = Some(rtoken);
+        Ok(())
     }
 
     pub async fn get_me(&self) -> Result<rspotify::model::PrivateUser, Error> {
@@ -122,6 +115,10 @@ impl SpotifyState {
             .current_user()
             .await
             .map_err(|e| Error::unauthenticated(e))
+    }
+
+    pub fn is_connected(&self) -> bool {
+        self.session.username().is_empty()
     }
 
     pub async fn get_user_playlists(
@@ -173,19 +170,14 @@ impl SpotifyState {
         }
     }
 
-    pub fn play_track(&self, id: String) -> Result<(), Error> {
+    pub fn load_track(&self, id: String) -> Result<(), Error> {
         let track_id = SpotifyId::from_uri(&id)?;
-        self.player.load(track_id, true, 0);
+        self.player.load(track_id, false, 0);
+        println!("Loaded track {}", id);
         Ok(())
     }
-    pub fn pause(&self) {
-        self.player.pause();
-    }
 
-    pub fn is_logged_in(&self) -> bool {
-        self.creds.is_some()
-    }
-    pub async fn auth(&mut self) -> Result<(), Error> {
+    pub async fn auth(&self) -> Result<(), Error> {
         let c = librespot_oauth::OAuthClientBuilder::new(
             SPOTIFY_CLIENT_ID,
             "http://127.0.0.1:8898/login",
@@ -198,8 +190,9 @@ impl SpotifyState {
         .await
         .map(|t| Credentials::with_access_token(t.access_token))
         .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
-        self.creds = Some(c);
-        self.connect().await?;
+        self.connect(c)
+            .await
+            .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
         Ok(())
     }
     async fn requires_refresh(&self, e: ClientError) -> bool {
@@ -217,12 +210,7 @@ impl SpotifyState {
                             .ok()
                     });
                     println!("rate limit hit, waiting for {}", wait.unwrap_or_default());
-                    sleep_until(
-                        Instant::now()
-                            .checked_add(Duration::from_secs(wait.unwrap_or_default()))
-                            .expect("Failed to add to delay, fatal"),
-                    )
-                    .await;
+                    tokio::time::sleep(Duration::from_secs(wait.unwrap_or_default())).await;
                     return true;
                 }
             }

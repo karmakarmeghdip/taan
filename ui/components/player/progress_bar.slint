@@ -1,0 +1,21 @@
+import { ProgressBar as CommonProgressBar } from "../common/slider.slint";
+
+export component ProgressBar {
+    in-out property <float> progress: 0.25; // 0.0 to 1.0
+    in-out property <string> current-time: "0:19";
+    in-out property <string> remaining-time: "-3:46";
+    callback seek(float);
+    // All functionality is now inherited from the common ProgressBar component
+    VerticalLayout {
+        padding-top: 16px;
+        padding-bottom: 16px;
+        CommonProgressBar {
+            progress <=> root.progress;
+            current-time: root.current-time;
+            remaining-time: root.remaining-time;
+            seek(value) => {
+                root.seek(value);
+            }
+        }
+    }
+}

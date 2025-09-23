@@ -1,0 +1,73 @@
+import { IconButton, ButtonSize, ButtonShape, Colors } from "../common/mod.slint";
+
+export component AdditionalControls inherits Rectangle {
+    callback stop-clicked();
+    callback shuffle-clicked();
+    callback repeat-clicked();
+    callback playlist-clicked();
+    height: 40px;
+    
+    HorizontalLayout {
+        alignment: space-around;
+        
+        // Stop button
+        stop-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.stop-clicked();
+            }
+            
+            Image {
+                source: @image-url("../../../resources/icons/square.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
+            }
+        }
+
+        // Shuffle button
+        shuffle-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.shuffle-clicked();
+            }
+            
+            Image {
+                source: @image-url("../../../resources/icons/shuffle.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
+            }
+        }
+
+        // Repeat button
+        repeat-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.repeat-clicked();
+            }
+            
+            Image {
+                source: @image-url("../../../resources/icons/repeat.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
+            }
+        }
+
+        // Playlist button
+        playlist-button := IconButton {
+            size: ButtonSize.small;
+            clicked => {
+                root.playlist-clicked();
+            }
+            
+            Image {
+                source: @image-url("../../../resources/icons/list-music.svg");
+                width: 16px;
+                height: 16px;
+                colorize: Colors.icon-secondary;
+            }
+        }
+    }
+}

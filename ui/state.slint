@@ -1,0 +1,16 @@
+export global AppState {
+    // Authentication state
+    callback initialize-app();
+    in property <bool> loading: true;
+    in property <bool> loggedIn: false;
+    in property <bool> login-in-progress: false;
+    callback login-clicked();
+    // Player state
+    in property <bool> is-playing: false;
+    callback play();
+    callback pause();
+    in-out property <float> progress: 0.25; // 0.0 to 1.0
+    in property <string> current-time: "0:00";
+    in property <string> remaining-time: "0:00";
+    in-out property <float> volume: 0.1; // 0.0 to 1.0
+}

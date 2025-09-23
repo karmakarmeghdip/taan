@@ -1,0 +1,9 @@
+import { CloseButton as CommonCloseButton } from "../common/button.slint";
+
+export component CloseButton inherits CommonCloseButton {
+    callback close-clicked();
+    
+    clicked => {
+        root.close-clicked();
+    }
+}

@@ -1,0 +1,70 @@
+import { IconButton, PrimaryButton, ButtonSize, ButtonShape, Colors, Spacing } from "../common/mod.slint";
+
+export component MainControls inherits Rectangle {
+    in-out property <bool> is-playing: false;
+    callback previous-clicked();
+    callback play-pause-clicked();
+    callback next-clicked();
+    height: 72px;
+    HorizontalLayout {
+        alignment: center;
+        spacing: Spacing.xl;
+        Rectangle {
+            height: parent.height;
+        // Previous button (circular like original)
+        prev-button := IconButton {
+                size: ButtonSize.medium;
+                shape: ButtonShape.circle;
+                clicked => {
+                    root.previous-clicked();
+                }
+                Image {
+                    source: @image-url("../../../resources/icons/rewind.svg");
+                    width: 24px;
+                    height: 24px;
+                    colorize: Colors.icon-secondary;
+                }
+            }
+        }
+
+        // Play/Pause button (primary action, circular by default)
+        play-button := PrimaryButton {
+            size: ButtonSize.large;
+            shape: ButtonShape.circle;
+            clicked => {
+                root.play-pause-clicked();
+            }
+            if root.is-playing: Image {
+                source: @image-url("../../../resources/icons/pause.svg");
+                width: 32px;
+                height: 32px;
+                colorize: Colors.icon-primary;
+            }
+            if !root.is-playing: Image {
+                source: @image-url("../../../resources/icons/play.svg");
+                width: 32px;
+                height: 32px;
+                colorize: Colors.icon-primary;
+            }
+        }
+
+        Rectangle {
+            height: parent.height;
+
+        // Next button (circular like original)
+        next-button := IconButton {
+                size: ButtonSize.medium;
+                shape: ButtonShape.circle;
+                clicked => {
+                    root.next-clicked();
+                }
+                Image {
+                    source: @image-url("../../../resources/icons/fast-forward.svg");
+                    width: 24px;
+                    height: 24px;
+                    colorize: Colors.icon-secondary;
+                }
+            }
+        }
+    }
+}

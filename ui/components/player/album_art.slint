@@ -1,0 +1,21 @@
+export component AlbumArt inherits Rectangle {
+    in-out property <string> album-art-url: "";
+    
+    // Center the album art within available space
+    album-art := Rectangle {
+        // Make it square while keeping it responsive
+        // Calculate square size based on available space, with a maximum of 300px
+        width: min(root.width - 48px, root.height - 56px);
+        height: self.width; // Same as width to make it square
+        border-radius: 8px;
+        clip: true;
+        Image {
+            // Note: For dynamic images, you'll need to handle this in the host language
+            // For now using a placeholder path
+            source: @image-url("../../../resources/album-art-placeholder.jpg");
+            image-fit: contain;
+            width: parent.width;
+            height: parent.height;
+        }
+    }
+}
