@@ -56,7 +56,7 @@ pub struct SpotifyState {
 impl Default for SpotifyState {
     fn default() -> SpotifyState {
         let cache = Cache::new(Some(CACHE), Some(CACHE), Some(CACHE_FILES), None)
-            .expect("Failed to initalise cache, fatal");
+            .expect("Failed to initialise cache, fatal");
         let session = Session::new(SessionConfig::default(), Some(cache));
         let player = Player::new(
             PlayerConfig::default(),
@@ -114,7 +114,7 @@ impl SpotifyState {
         self.client
             .current_user()
             .await
-            .map_err(|e| Error::unauthenticated(e))
+            .map_err(Error::unauthenticated)
     }
 
     pub fn is_connected(&self) -> bool {
@@ -199,7 +199,9 @@ impl SpotifyState {
         if let ClientError::Http(e) = e {
             if let HttpError::StatusCode(res) = *e {
                 if res.status() == 401 {
-                    self.web_auth().await;
+                    self.web_auth().await.unwrap_or_else(|e| {
+                        eprintln!("Failed to refresh client: {}", e);
+                    });
                     return true;
                 }
                 if res.status() == 429 {
@@ -215,6 +217,6 @@ impl SpotifyState {
                 }
             }
         }
-        return false;
+        false
     }
 }

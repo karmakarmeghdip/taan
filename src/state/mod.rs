@@ -1,3 +1,4 @@
+use i_slint_backend_winit::WinitWindowAccessor;
 use slint::ComponentHandle;
 
 pub fn setup(
@@ -6,6 +7,8 @@ pub fn setup(
     rt: tokio::runtime::Handle,
 ) {
     initialize_app(ui.clone_strong(), spot.clone(), rt.clone());
+    drag_window(ui.clone_strong());
+    close_window(ui.clone_strong());
     start_oauth_login(ui.clone_strong(), spot.clone(), rt.clone());
     play(ui.clone_strong(), spot.clone());
     pause(ui.clone_strong(), spot.clone());
@@ -49,6 +52,24 @@ pub fn initialize_app(
     });
 }
 
+pub fn drag_window(ui: crate::MainWindow) {
+    let ui_weak = ui.as_weak();
+    let app = ui.global::<crate::AppState>();
+    app.on_start_drag(move || {
+        ui_weak.unwrap().window().with_winit_window(|win| {
+            win.drag_window()
+                .unwrap_or_else(|e| eprintln!("Failed to drag window: {}", e));
+        });
+    });
+}
+
+pub fn close_window(ui: crate::MainWindow) {
+    let app = ui.global::<crate::AppState>();
+    app.on_close_window(move || {
+        // ui_weak.unwrap().hide().unwrap();
+        slint::quit_event_loop().unwrap();
+    });
+}
 pub fn start_oauth_login(
     ui: crate::MainWindow,
     spot: crate::spotify::SpotifyState,

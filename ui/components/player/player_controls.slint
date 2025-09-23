@@ -6,52 +6,33 @@ import { AdditionalControls } from "additional_controls.slint";
 import { AppState } from "../../state.slint";
 
 export component PlayerControls inherits Rectangle {
-    // Properties for player state
-    in-out property <string> song-title: "Albireo";
-    in-out property <string> artist-name: "Rokudenashi";
-    in-out property <string> composer: "ナユタン星人";
-    in-out property <float> progress: 0.25; // 0.0 to 1.0
-    in-out property <string> current-time: "0:19";
-    in-out property <string> remaining-time: "-3:46";
-    in-out property <float> volume: 0.7; // 0.0 to 1.0
-    
-    // Callbacks
-    callback seek(float);
-    callback volume-changed(float);
-    callback previous-clicked();
-    callback play-pause-clicked();
-    callback next-clicked();
-    callback stop-clicked();
-    callback shuffle-clicked();
-    callback repeat-clicked();
-    callback playlist-clicked();
     vertical-stretch: 0; // Fixed size, won't shrink
     
     VerticalLayout {
         alignment: LayoutAlignment.stretch;
         padding: 24px;
-        padding-top: 72px;
+//        padding-top: 72px;
         spacing: 16px;
         // Volume control section
         volume-slider := VolumeSlider {
-            volume <=> root.volume;
+            volume <=> AppState.volume;
             volume-changed(value) => {
-                root.volume-changed(value);
+                AppState.volume-changed(value);
             }
         }
         
         // Song information section
         song-info := SongInfo {
-            song-title: root.song-title;
-            artist-name: root.artist-name;
-            composer: root.composer;
+            song-title: AppState.song-title;
+            artist-name: AppState.artist-name;
+            composer: AppState.composer;
         }
         
         // Main controls section  
         main-controls := MainControls {
             is-playing: AppState.is-playing;
             previous-clicked => {
-                root.previous-clicked();
+                // AppState.previous-clicked();
             }
             play-pause-clicked => {
                 if (AppState.is-playing) {
@@ -61,34 +42,34 @@ export component PlayerControls inherits Rectangle {
                 }
             }
             next-clicked => {
-                root.next-clicked();
+                // AppState.next-clicked();
             }
         }
         
         
         // Progress bar section
         progress-bar := ProgressBar {
-            progress <=> root.progress;
-            current-time: root.current-time;
-            remaining-time: root.remaining-time;
+            progress <=> AppState.progress;
+            current-time: AppState.current-time;
+            remaining-time: AppState.remaining-time;
             seek(value) => {
-                root.seek(value);
+                // AppState.seek(value);
             }
         }
         
         // Additional controls section
         additional-controls := AdditionalControls {
             stop-clicked => {
-                root.stop-clicked();
+                // AppState.stop-clicked();
             }
             shuffle-clicked => {
-                root.shuffle-clicked();
+                // AppState.shuffle-clicked();
             }
             repeat-clicked => {
-                root.repeat-clicked();
+                // AppState.repeat-clicked();
             }
             playlist-clicked => {
-                root.playlist-clicked();
+                // AppState.playlist-clicked();
             }
         }
     }

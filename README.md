@@ -20,7 +20,7 @@ Currently, Taan is a work-in-progress. Here are some of the features that are be
 ## 🛠️ Tech Stack
 
 - **Rust**: The core language for the application.
-- **Xilem**: A modern Rust UI framework for building native applications.
+- **Slint**: A modern Rust UI toolkit for building native applications.
 - **librespot**: An open-source client library for Spotify.
 - **rspotify**: A Rust wrapper for the Spotify Web API.
 
@@ -35,10 +35,10 @@ Currently, Taan is a work-in-progress. Here are some of the features that are be
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/meghdip/xilem_spotify.git
-    cd xilem_spotify
+    git clone https://github.com/meghdip/taan.git
+    cd taan
     ```
-
+    
 2.  **Run the application:**
     ```sh
     cargo run

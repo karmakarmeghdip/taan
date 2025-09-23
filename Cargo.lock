@@ -5973,8 +5973,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "i-slint-backend-winit",
  "librespot-core",
- "librespot-metadata",
  "librespot-oauth",
  "librespot-playback",
  "openssl-sys",

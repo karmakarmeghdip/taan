@@ -1,71 +1,21 @@
 import { AlbumArt } from "components/player/album_art.slint";
 import { PlayerControls } from "components/player/player_controls.slint";
-import { CloseButton } from "components/player/close_button.slint";
 import { Colors } from "components/common/colors.slint";
 import { AppState } from "state.slint";
 
 export component MusicPlayer {
-    // Properties for player state
-    property <string> song-title: "Albireo";
-    property <string> artist-name: "Rokudenashi";
-    property <string> composer: "ナユタン星人";
-    property <string> album-art-url: "https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94";
-    property <float> progress: 0.25; // 0.0 to 1.0
-    property <string> current-time: "0:19";
-    property <string> remaining-time: "-3:46";
-    property <float> volume: 0.7; // 0.0 to 1.0
-    
-    
     // Main layout - horizontal with album art area and controls area
     HorizontalLayout {
         padding: 0px;
         spacing: 0px;
-        
+
         // Album art section
         album-art-container := Rectangle {
             horizontal-stretch: 0;
-            album-art := AlbumArt {
-                album-art-url: album-art-url;
-            }
+            album-art := AlbumArt { }
         }
-        
+
         // Controls section
-        player-controls := PlayerControls {
-            song-title: root.song-title;
-            artist-name: root.artist-name;
-            composer: root.composer;
-            progress <=> root.progress;
-            current-time: root.current-time;
-            remaining-time: root.remaining-time;
-            volume <=> root.volume;
-            seek(value) => {
-            }
-            volume-changed(value) => {
-            }
-            previous-clicked => {
-            }
-            next-clicked => {
-            }
-            stop-clicked => {
-            }
-            shuffle-clicked => {
-            }
-            repeat-clicked => {
-            }
-            playlist-clicked => {
-                // Handle playlist view
-                debug("Playlist clicked");
-            }
-        }
+        player-controls := PlayerControls { }
     }
-    
-    // // Close button (positioned absolutely in top-right)
-    // close-button := CloseButton {
-    //     x: parent.width - self.width - 16px;
-    //     y: 16px;
-    //     close-clicked => {
-    //         // Handle close
-    //         debug("Close clicked");
-    //     }
-    // }
 }

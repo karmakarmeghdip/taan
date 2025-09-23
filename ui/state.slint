@@ -1,4 +1,7 @@
 export global AppState {
+    // Window state
+    callback start-drag();
+    callback close-window();
     // Authentication state
     callback initialize-app();
     in property <bool> loading: true;
@@ -7,10 +10,15 @@ export global AppState {
     callback login-clicked();
     // Player state
     in property <bool> is-playing: false;
-    callback play();
-    callback pause();
-    in-out property <float> progress: 0.25; // 0.0 to 1.0
+    in property <image> album-art: @image-url("../resources/album-art-placeholder.jpg");
+    in property <string> song-title: "Albireo";
+    in property <string> artist-name: "Rokudenashi";
+    in property <string> composer: "ナユタン星人";
+    in property <float> progress: 0.25; // 0.0 to 1.0
     in property <string> current-time: "0:00";
     in property <string> remaining-time: "0:00";
-    in-out property <float> volume: 0.1; // 0.0 to 1.0
+    in property <float> volume: 1.0; // 0.0 to 1.0
+    callback play();
+    callback pause();
+    callback volume-changed(float);
 }

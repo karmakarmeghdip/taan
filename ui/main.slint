@@ -1,28 +1,37 @@
 import { MusicPlayer } from "player.slint";
 import { LoginWindow } from "login.slint";
+import { CloseButton } from "components/common/close_button.slint";
 import { Colors } from "components/common/colors.slint";
 import "../resources/fonts/Inter-Regular.ttf";
 import { AppState } from "state.slint";
 
-export { AppState } from "state.slint";
+export { AppState }
 
 export component MainWindow inherits Window {
     title: "Taan";
     min-width: 672px;
     min-height: 300px;
+//    no-frame: true;
     background: Colors.background-primary;
     default-font-family: "Inter";
-    
-    
-    
-    // Show appropriate view based on authentication state
-    if !AppState.loggedIn: LoginWindow {
-        preferred-width: parent.width;
-        preferred-height: parent.height;
-    }
-    if AppState.loggedIn: MusicPlayer {
-        preferred-width: parent.width;
-        preferred-height: parent.height;
+    VerticalLayout {
+//        HorizontalLayout {
+//            TouchArea {
+//                moved => {
+//                    AppState.start-drag();
+//                }
+//            }
+//
+//            close-button := CloseButton {
+//                close-clicked => {
+//                    AppState.close-window();
+//                }
+//            }
+//        }
+
+        // Show appropriate view based on authentication state
+    if !AppState.loggedIn: LoginWindow { }
+        if AppState.loggedIn: MusicPlayer { }
     }
     
     // Initialize app on startup
