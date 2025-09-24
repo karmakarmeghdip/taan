@@ -1,89 +1,79 @@
 import { Colors, Spacing, BorderRadius, Animations } from "colors.slint";
+import { SliderBase } from "slider-base.slint";
 
-// Reusable slider component for progress bars, volume controls, etc.
-export component Slider inherits Rectangle {
-    // Properties
-    in-out property <float> value: 0.0; // Current value (0.0 to 1.0)
-    in property <bool> enabled: true;
-    in property <bool> show-handle: true;
-    in property <length> track-height: 4px;
-    in property <length> handle-size: 12px;
-    
-    // Callbacks
-    callback value-changed(float); // Emitted when value changes
-    
-    // Styling
-    height: max(track-height, handle-size) + 4px; // Add padding for handle
-    
-    // Slider track background
-    slider-track := Rectangle {
-        width: parent.width;
-        height: track-height;
-        y: (parent.height - self.height) / 2;
-        background: Colors.slider-track;
-        border-radius: track-height / 2;
-        
-        // Slider fill (progress)
-        slider-fill := Rectangle {
-            x: 0; // Anchor the fill to the left
-            width: parent.width * root.value;
-            height: parent.height;
-            background: Colors.slider-fill;
-            border-radius: parent.border-radius;
-        }
-        
-        // Slider handle
-        if show-handle: slider-handle := Rectangle {
-            width: handle-size;
-            height: handle-size;
-            background: Colors.slider-handle;
-            border-radius: handle-size / 2;
-            x: (parent.width * root.value) - (self.width / 2);
-            y: (parent.height - self.height) / 2;
-            
-            // Handle states
-            states [
-                hovered when touch-area.has-hover && root.enabled: {
-                    width: handle-size + 2px;
-                    height: handle-size + 2px;
-                    border-radius: (handle-size + 2px) / 2;
-                }
-                pressed when touch-area.pressed && root.enabled: {
-                    width: handle-size + 4px;
-                    height: handle-size + 4px;
-                    border-radius: (handle-size + 4px) / 2;
-                }
-            ]
-            animate width, height, border-radius { duration: Animations.fast; }
-        }
-    }
-    
-    // Touch interaction area
-    touch-area := TouchArea {
-        enabled: root.enabled;
-        width: parent.width;
-        height: parent.height;
-        clicked => {
-            let new-value = max(0, min(1, self.mouse-x / self.width));
-            root.value = new-value;
-            root.value-changed(new-value);
-        }
-        moved => {
-            if (self.pressed) {
-                let new-value = max(0, min(1, self.mouse-x / self.width));
-                root.value = new-value;
-                root.value-changed(new-value);
-            }
-        }
-    }
-    
-    // Disabled state
+export component CustomSlider {
+    in property <Orientation> orientation <=> base.orientation;
+    in property <float> maximum <=> base.maximum;
+    in property <float> minimum <=> base.minimum;
+    in property <float> step <=> base.step;
+    in property <bool> enabled <=> base.enabled;
+    out property <bool> has-focus: base.has-focus;
+    in-out property <float> value <=> base.value;
+
+    callback changed <=> base.changed;
+    callback released <=> base.released;
+
+    min-width: base.vertical ? 20px : 0px;
+    min-height: base.vertical ? 0px : 20px;
+    vertical-stretch: base.vertical ? 1 : 0;
+    horizontal-stretch: base.vertical ? 0 : 1;
+    accessible-role: slider;
+    accessible-enabled: root.enabled;
+    accessible-value: root.value;
+    accessible-value-minimum: root.minimum;
+    accessible-value-maximum: root.maximum;
+    accessible-value-step: min(root.step, (root.maximum - root.minimum) / 100);
+    forward-focus: base;
+
     states [
         disabled when !root.enabled: {
-            opacity: Colors.opacity-disabled;
+            track.background: Colors.text-muted;
+            rail.background: Colors.text-muted;
+            thumb.background: Colors.text-muted;
+        }
+        pressed when base.handle-pressed: {
+            thumb.background: Colors.slider-handle;
+        }
+        hover when base.has-hover: {
+            thumb.background: Colors.slider-handle;
         }
     ]
-    animate opacity { duration: Animations.fast; }
+
+    rail := Rectangle {
+        x: base.vertical ? (parent.width - self.width) / 2 : thumb.width / 2;
+        y: base.vertical ? thumb.height / 2 : (parent.height - self.height) / 2;
+        width: base.vertical ? 3px : parent.width - thumb.width;
+        height: base.vertical ? parent.height - thumb.height : 3px;
+        background: Colors.slider-track;
+        border-radius: BorderRadius.sm;
+    }
+
+    track := Rectangle {
+        x: base.vertical ? (parent.width - self.width) / 2 : thumb.width / 2;
+        y: base.vertical ? thumb.height / 2 : (parent.height - self.height) / 2;
+        width: base.vertical ? rail.width : thumb.x;
+        height: base.vertical ? thumb.y : rail.height;
+        background: Colors.slider-fill;
+        border-radius: rail.border-radius;
+    }
+
+    thumb := Rectangle {
+        x: base.vertical ? (parent.width - self.width) / 2 : clamp((parent.width - self.width) * (root.value - root.minimum) / (root.maximum - root.minimum), 0, parent.width - self.width);
+        y: base.vertical ? clamp((parent.height - self.height) * (root.value - root.minimum) / (root.maximum - root.minimum), 0, parent.height - self.height) : (parent.height - self.height) / 2;
+        width: 14px;
+        height: 14px;
+        border-radius: BorderRadius.full;
+        background: Colors.slider-handle;
+    }
+
+    base := SliderBase {
+        width: 100%;
+        height: 100%;
+        handle-x: thumb.x;
+        handle-y: thumb.y;
+        handle-width: thumb.width;
+        handle-height: thumb.height;
+    }
 }
 
 // Progress bar component - specialized slider for showing progress without interaction
@@ -92,15 +82,16 @@ export component ProgressBar inherits Rectangle {
     in-out property <float> progress: 0.0; // Progress value (0.0 to 1.0)
     in-out property <string> current-time: "0:00";
     in-out property <string> remaining-time: "-0:00";
-    
+
     // Callbacks
     callback seek(float); // Emitted when user seeks to a position
-    
+    callback moved(float); // Emitted when user is moving the slider
+
     height: 20px;
     HorizontalLayout {
         alignment: LayoutAlignment.stretch;
         spacing: Spacing.sm;
-        
+
         // Current time
         current-time-text := Text {
             text: root.current-time;
@@ -110,17 +101,20 @@ export component ProgressBar inherits Rectangle {
             min-width: 32px;
             max-width: 32px;
         }
-        
+
         // Progress slider
-        progress-slider := Slider {
+        progress-slider := CustomSlider {
+            minimum: 0.0;
+            maximum: 1.0;
             value <=> root.progress;
-            track-height: 4px;
-            handle-size: 12px;
-            value-changed(new-value) => {
+            released(new-value) => {
                 root.seek(new-value);
             }
+            changed(new-value) => {
+                root.moved(new-value);
+            }
         }
-        
+
         // Remaining time
         remaining-time-text := Text {
             text: root.remaining-time;
@@ -137,10 +131,10 @@ export component ProgressBar inherits Rectangle {
 export component VolumeSlider inherits Rectangle {
     // Properties
     in-out property <float> volume: 0.7; // Volume value (0.0 to 1.0)
-    
+
     // Callbacks
     callback volume-changed(float); // Emitted when volume changes
-    
+
     height: 24px;
     HorizontalLayout {
         spacing: Spacing.md;
@@ -159,12 +153,13 @@ export component VolumeSlider inherits Rectangle {
         Rectangle {
             height: parent.height;
         // Volume slider
-        volume-slider := Slider {
+        volume-slider := CustomSlider {
                 horizontal-stretch: 1;
+                minimum: 0.0;
+                maximum: 1.0;
                 value <=> root.volume;
-                track-height: 4px;
-                handle-size: 8px;
-                value-changed(new-value) => {
+
+                released(new-value) => {
                     root.volume-changed(new-value);
                 }
             }

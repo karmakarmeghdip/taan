@@ -1,38 +1,39 @@
 use image::EncodableLayout;
-use slint::{ComponentHandle, SharedString};
-use std::ops::Div;
+use slint::ComponentHandle;
 
 pub fn play(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     let app = ui.global::<crate::AppState>();
-    let ui = ui.clone_strong();
     app.on_play(move || {
         println!("Playing predefined music for testing");
         spot.player.play();
-        let app = ui.global::<crate::AppState>();
-        app.set_is_playing(true);
     });
 }
 
 pub fn pause(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     let app = ui.global::<crate::AppState>();
-    let ui = ui.clone_strong();
     app.on_pause(move || {
         println!("Pausing music for testing");
         spot.player.pause();
-        let app = ui.global::<crate::AppState>();
-        app.set_is_playing(false);
     });
 }
 
-pub fn volume_changed(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
+pub fn seek(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     let app = ui.global::<crate::AppState>();
-    app.on_volume_changed(move |v| {
-        // spot.player
-        //     .emit_volume_changed_event((v * 100.0).floor() as u16);
-        // println!("Volume changed to {}", v);
-        // TODO: Doesn't work for some reason, also need to implement debouncing
+    app.on_seek(move |pos| {
+        println!("Seeking to position {}", pos);
+        spot.player.seek(pos as u32);
     });
 }
+
+// pub fn volume_changed(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
+//     let app = ui.global::<crate::AppState>();
+//     app.on_volume_changed(move |v| {
+//         // spot.player
+//         //     .emit_volume_changed_event((v * 100.0).floor() as u16);
+//         // println!("Volume changed to {}", v);
+//         // TODO: Doesn't work for some reason, also need to implement debouncing
+//     });
+// }
 
 pub fn player_event_handler(
     ui: crate::MainWindow,
@@ -62,6 +63,40 @@ pub fn player_event_handler(
                         }
                     }
                 }
+                librespot_playback::player::PlayerEvent::Paused {
+                    position_ms,
+                    play_request_id,
+                    track_id,
+                } => {
+                    ui_weak
+                        .upgrade_in_event_loop(move |ui| {
+                            let app = ui.global::<crate::AppState>();
+                            app.set_is_playing(false);
+                            app.set_current_time(position_ms as i64);
+                        })
+                        .unwrap();
+                }
+                librespot_playback::player::PlayerEvent::Playing {
+                    position_ms,
+                    play_request_id,
+                    track_id,
+                } => {
+                    ui_weak
+                        .upgrade_in_event_loop(move |ui| {
+                            let app = ui.global::<crate::AppState>();
+                            app.set_is_playing(true);
+                            app.set_current_time(position_ms as i64);
+                        })
+                        .unwrap();
+                }
+                librespot_playback::player::PlayerEvent::Seeked { position_ms, .. } => {
+                    ui_weak
+                        .upgrade_in_event_loop(move |ui| {
+                            let app = ui.global::<crate::AppState>();
+                            app.set_current_time(position_ms as i64);
+                        })
+                        .unwrap();
+                }
                 _ => {
                     println!("Player event received: {:#?}", e);
                 }
@@ -72,10 +107,28 @@ pub fn player_event_handler(
 
 fn set_track(app: &crate::AppState, track: Box<librespot_metadata::audio::item::AudioItem>) {
     app.set_song_title(track.name.into());
-    let duration = track.duration_ms.div(1000);
-    let minutes = duration.div(60);
-    let seconds = duration % 60;
-    app.set_remaining_time(SharedString::from(format!("{}:{}", minutes, seconds)));
+    app.set_music_duration(track.duration_ms as i64);
+    match track.unique_fields {
+        librespot_metadata::audio::UniqueFields::Track {
+            artists,
+            album,
+            album_artists,
+            ..
+        } => {
+            let mut composers = vec![];
+            for artist in artists.0 {
+                if artist.role == librespot_protocol::metadata::artist_with_role::ArtistRole::ARTIST_ROLE_MAIN_ARTIST {
+                    app.set_artist_name(artist.name.into());
+                } else if artist.role == librespot_protocol::metadata::artist_with_role::ArtistRole::ARTIST_ROLE_COMPOSER {
+                    composers.push(artist.name);
+                }
+            }
+            let composer_str = composers.join(", ");
+            app.set_composer(composer_str.into());
+            app.set_album(album.into());
+        }
+        librespot_metadata::audio::UniqueFields::Episode { .. } => todo!(),
+    }
 }
 
 async fn get_cover_image(ui_weak: slint::Weak<crate::MainWindow>, url: &str) -> anyhow::Result<()> {

@@ -15,7 +15,8 @@ pub fn setup(
     auth::start_oauth_login(ui.clone_strong(), spot.clone(), rt.clone());
     player::play(ui.clone_strong(), spot.clone());
     player::pause(ui.clone_strong(), spot.clone());
-    player::volume_changed(ui.clone_strong(), spot.clone());
+    // player::volume_changed(ui.clone_strong(), spot.clone());
+    player::seek(ui.clone_strong(), spot.clone());
     player::player_event_handler(ui.clone_strong(), spot.clone(), rt.clone());
 }
 

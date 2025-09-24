@@ -1,20 +1,26 @@
 import { ProgressBar as CommonProgressBar } from "../common/slider.slint";
 
 export component ProgressBar {
-    in-out property <float> progress: 0.25; // 0.0 to 1.0
-    in-out property <string> current-time: "0:19";
-    in-out property <string> remaining-time: "-3:46";
-    callback seek(float);
+    pure function duration-to-string(time: duration) -> string {
+        return Math.floor(time / 60s) + ":" + Math.floor(Math.mod(time / 1s, 60));
+    }
+    in-out property <duration> current-time: 0s;
+    in-out property <duration> music-duration: 0s;
+    property <float> progress: music-duration == 0s ? 0.0 : current-time / music-duration;
+    callback seek(duration);
     // All functionality is now inherited from the common ProgressBar component
     VerticalLayout {
         padding-top: 16px;
         padding-bottom: 16px;
         CommonProgressBar {
             progress <=> root.progress;
-            current-time: root.current-time;
-            remaining-time: root.remaining-time;
+            current-time: duration-to-string(root.current-time);
+            remaining-time: duration-to-string(root.music-duration - root.current-time);
             seek(value) => {
-                root.seek(value);
+                root.seek(value * root.music-duration);
+            }
+            moved(value) => {
+                root.current-time = value * root.music-duration;
             }
         }
     }

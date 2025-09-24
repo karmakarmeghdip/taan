@@ -7,28 +7,28 @@ import { AppState } from "../../state.slint";
 
 export component PlayerControls inherits Rectangle {
     vertical-stretch: 0; // Fixed size, won't shrink
-    
+
     VerticalLayout {
         alignment: LayoutAlignment.stretch;
         padding: 24px;
 //        padding-top: 72px;
         spacing: 16px;
         // Volume control section
-        volume-slider := VolumeSlider {
-            volume <=> AppState.volume;
-            volume-changed(value) => {
-                AppState.volume-changed(value);
-            }
-        }
-        
+        // volume-slider := VolumeSlider {
+        //     volume <=> AppState.volume;
+        //     volume-changed(value) => {
+        //         AppState.volume-changed(value);
+        //     }
+        // }
+
         // Song information section
         song-info := SongInfo {
             song-title: AppState.song-title;
             artist-name: AppState.artist-name;
             composer: AppState.composer;
         }
-        
-        // Main controls section  
+
+        // Main controls section
         main-controls := MainControls {
             is-playing: AppState.is-playing;
             previous-clicked => {
@@ -45,18 +45,17 @@ export component PlayerControls inherits Rectangle {
                 // AppState.next-clicked();
             }
         }
-        
-        
+
         // Progress bar section
         progress-bar := ProgressBar {
-            progress <=> AppState.progress;
             current-time: AppState.current-time;
-            remaining-time: AppState.remaining-time;
+            music-duration: AppState.music-duration;
             seek(value) => {
-                // AppState.seek(value);
+                AppState.seek(value);
+                debug(value);
             }
         }
-        
+
         // Additional controls section
         additional-controls := AdditionalControls {
             stop-clicked => {

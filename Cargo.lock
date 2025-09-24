@@ -6037,6 +6037,7 @@ dependencies = [
  "librespot-metadata",
  "librespot-oauth",
  "librespot-playback",
+ "librespot-protocol",
  "openssl-sys",
  "reqwest",
  "rspotify",
