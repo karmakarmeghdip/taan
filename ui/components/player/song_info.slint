@@ -1,7 +1,7 @@
 export component SongInfo inherits Rectangle {
     in-out property <string> song-title: "Song Title";
     in-out property <string> artist-name: "Artist Name";
-    in-out property <string> composer: "Composer Name";
+    in-out property <[string]> composer: ["Composer Name 1", "Composer Name 2"];
     VerticalLayout {
         alignment: center;
         spacing: 4px;
@@ -20,11 +20,15 @@ export component SongInfo inherits Rectangle {
             horizontal-alignment: center;
         }
 
-        composer-text := Text {
-            text: "Written by " + root.composer;
-            color: #6b7280;
-            font-size: 14px;
-            horizontal-alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            spacing: 20px;
+            for name in root.composer: Text {
+                text: name;
+                color: #6b7280;
+                font-size: 14px;
+                horizontal-alignment: center;
+            }
         }
     }
 }

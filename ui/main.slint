@@ -11,23 +11,24 @@ export component MainWindow inherits Window {
     title: "Taan";
     min-width: 672px;
     min-height: 300px;
-//    no-frame: true;
+    no-frame: true;
+    resize-border-width: 4px;
     background: Colors.background-primary;
     default-font-family: "Inter";
     VerticalLayout {
-//        HorizontalLayout {
-//            TouchArea {
-//                moved => {
-//                    AppState.start-drag();
-//                }
-//            }
-//
-//            close-button := CloseButton {
-//                close-clicked => {
-//                    AppState.close-window();
-//                }
-//            }
-//        }
+        HorizontalLayout {
+            TouchArea {
+                moved => {
+                    AppState.start-drag();
+                }
+            }
+
+            close-button := CloseButton {
+                close-clicked => {
+                    AppState.close-window();
+                }
+            }
+        }
 
         // Show appropriate view based on authentication state
     if !AppState.loggedIn: LoginWindow { }
