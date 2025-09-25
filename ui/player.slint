@@ -5,17 +5,35 @@ import { AppState } from "state.slint";
 
 export component MusicPlayer {
     // Main layout - horizontal with album art area and controls area
-    HorizontalLayout {
+    if root.width < root.height: VerticalLayout {
         padding: 0px;
         spacing: 0px;
 
         // Album art section
-        album-art-container := Rectangle {
+        Rectangle {
             horizontal-stretch: 0;
-            album-art := AlbumArt { }
+            vertical-stretch: 1;
+            AlbumArt { }
         }
 
         // Controls section
-        player-controls := PlayerControls { }
+        PlayerControls { }
+    }
+    if root.height < root.width: HorizontalLayout {
+        padding: 0px;
+        spacing: 0px;
+        alignment: LayoutAlignment.stretch;
+
+        // Album art section
+        Rectangle {
+            horizontal-stretch: 0;
+            min-width: 200px;
+            AlbumArt { }
+        }
+
+        // Controls section
+        PlayerControls {
+            max-width: 600px;
+        }
     }
 }

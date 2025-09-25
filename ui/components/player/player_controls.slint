@@ -11,7 +11,6 @@ export component PlayerControls inherits Rectangle {
     VerticalLayout {
         alignment: LayoutAlignment.stretch;
         padding: 24px;
-//        padding-top: 72px;
         spacing: 16px;
         // Volume control section
         // volume-slider := VolumeSlider {
@@ -32,7 +31,7 @@ export component PlayerControls inherits Rectangle {
         main-controls := MainControls {
             is-playing: AppState.is-playing;
             previous-clicked => {
-                // AppState.previous-clicked();
+                 // AppState.previous-clicked();
             }
             play-pause-clicked => {
                 if (AppState.is-playing) {
