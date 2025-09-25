@@ -1,3 +1,18 @@
+struct Playlist {
+    name: string,
+    id: string,
+    cover-art: image,
+}
+
+struct Track {
+    title: string,
+    id: string,
+    duration: int,
+    artist: string,
+    album: string,
+    cover-art: image,
+}
+
 export global AppState {
     // Window state
     callback start-drag();
@@ -10,16 +25,32 @@ export global AppState {
     callback login-clicked();
     // Player state
     in property <bool> is-playing: false;
-    in property <string> song-title: "Albireo";
+    in property <string> song-title: "Nothing Playing";
     in property <image> album-art: @image-url("../resources/album-art-placeholder.svg");
-    in property <string> album: "Rokudenashi";
-    in property <string> artist-name: "Rokudenashi";
-    in property <string> composer: "ナユタン星人";
+    in property <string> album: "";
+    in property <string> artist-name: "";
+    in property <string> composer: "";
     in property <int> current-time: 0; // in seconds
     in property <int> music-duration: 0; // in seconds
     in property <float> volume: 1.0; // 0.0 to 1.0
     callback play();
     callback pause();
     callback volume-changed(float);
+    callback next-clicked();
+    callback previous-clicked();
+    callback stop-clicked();
+    callback shuffle-clicked();
+    callback repeat-clicked();
     callback seek(int);
+    // Playlists state
+    in property <Playlist> playlists;
+    callback playlist-clicked(string);
+    callback fetch-playlists();
+    in property <bool> fetching-playlists: false;
+    // Tracks state
+    in property <string> current-playlist-id: "";
+    in property <bool> fetching-tracks: false;
+    in property <Track> tracks;
+    callback track-clicked(string);
+    callback fetch-tracks(string);
 }

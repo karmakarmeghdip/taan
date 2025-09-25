@@ -15,21 +15,21 @@ librespot-metadata = "0.7.1"
 librespot-protocol = "0.7.1"
 reqwest = "0.12.23"
 image = "0.25.8"
-rspotify = "0.15.1"
+rspotify = { version = "0.15.1", features = ["reqwest-middleware"] }
 chrono = "0.4.42"
-slint = { version = "1.13.1" }
+slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
 tokio = { version = "1", features = ["full"] }
-anyhow = "1.0.100"
+anyhow = "1"
 tokio-util = "0.7.16"
+http-cache-reqwest = "0.16.0"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+i-slint-backend-winit = "1.13.1"
 
 [target.'cfg(target_os = "android")'.dependencies]
 slint = { version = "1.13.1", features = ["backend-android-activity-06"] }
 rspotify = { version = "0.15.1", features = ["reqwest-native-tls-vendored"] }
 reqwest = { version = "0.12.23", features = ["native-tls-vendored"] }
-
-[target.'cfg(not(target_os = "android"))'.dependencies]
-i-slint-backend-winit = "1.13.1"
-slint = { version = "1.13.1", feature = ["renderer-skia", "backend-winit"] }
 
 [build-dependencies]
 slint-build = "1.13.1"

@@ -19,7 +19,6 @@ pub fn setup(
     auth::start_oauth_login(ui.clone(), spot.clone(), rt.clone());
     player::play(ui.clone(), spot.clone());
     player::pause(ui.clone(), spot.clone());
-    // player::volume_changed(ui.clone_strong(), spot.clone());
     player::seek(ui.clone(), spot.clone());
     player::player_event_handler(ui.clone(), spot.clone(), rt.clone());
 }
@@ -30,21 +29,18 @@ pub fn initialize_app(
     rt: tokio::runtime::Handle,
 ) {
     rt.spawn(async move {
-        let _ = spot
-            .init()
+        spot.init()
             .await
-            .inspect_err(|e| eprintln!("Failed to init spotify client: {}", e));
+            .unwrap_or_else(|e| eprintln!("Failed to init spotify client: {}", e));
         ui.upgrade_in_event_loop(|ui| {
             let app = ui.global::<crate::AppState>();
             app.set_loading(false);
             println!("Initialized slint event loop");
         })
         .unwrap();
-        let r = spot
-            .web_auth()
-            .await
-            .inspect_err(|e| eprintln!("Failed to init spotify web api: {}", e));
-        if r.is_ok() {
+        if let Err(e) = spot.web_auth().await {
+            eprintln!("Failed to init spotify web api: {}", e)
+        } else {
             ui.upgrade_in_event_loop(|ui| {
                 let app = ui.global::<crate::AppState>();
                 app.set_loggedIn(true);

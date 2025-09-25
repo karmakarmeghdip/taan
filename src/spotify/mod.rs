@@ -1,5 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
+use http_cache_reqwest::{CACacheManager, CacheMode, CacheOptions, HttpCache, HttpCacheOptions};
 use librespot_core::{
     Error, Session, SessionConfig, SpotifyId, authentication::Credentials, cache::Cache,
 };
@@ -69,7 +70,19 @@ impl Default for SpotifyState {
                 )
             },
         );
-        let mut client = AuthCodeSpotify::default();
+        let mut client = AuthCodeSpotify::default().with_middleware_arc(Arc::new(
+            http_cache_reqwest::Cache(HttpCache {
+                mode: CacheMode::Default,
+                manager: CACacheManager::new(CACHE.into(), false),
+                options: HttpCacheOptions {
+                    cache_options: Some(CacheOptions {
+                        shared: false,
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                },
+            }),
+        ));
         client.config.token_refreshing = false;
         SpotifyState {
             session,
