@@ -48,11 +48,23 @@ export component PlayerControls inherits Rectangle {
 
         // Progress bar section
         progress-bar := ProgressBar {
-            current-time: AppState.current-time;
+            current-time <=> AppState.current-time;
             music-duration: AppState.music-duration;
             seek(value) => {
                 AppState.seek(value);
                 debug(value);
+            }
+        }
+
+        Timer {
+            running: AppState.is-playing;
+            interval: 1s;
+            triggered => {
+                debug("Updating Current time");
+                if (AppState.current-time < AppState.music-duration) {
+                    AppState.current-time += 1;
+                    debug("Updated current time to " + AppState.current-time + "s");
+                }
             }
         }
 

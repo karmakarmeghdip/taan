@@ -1,7 +1,8 @@
 use image::EncodableLayout;
 use slint::ComponentHandle;
 
-pub fn play(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
+pub fn play(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+    let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_play(move || {
         println!("Playing predefined music for testing");
@@ -9,7 +10,8 @@ pub fn play(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     });
 }
 
-pub fn pause(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
+pub fn pause(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+    let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_pause(move || {
         println!("Pausing music for testing");
@@ -17,11 +19,12 @@ pub fn pause(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
     });
 }
 
-pub fn seek(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
+pub fn seek(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+    let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_seek(move |pos| {
         println!("Seeking to position {}", pos);
-        spot.player.seek(pos as u32);
+        spot.player.seek((pos * 1000) as u32);
     });
 }
 
@@ -36,11 +39,11 @@ pub fn seek(ui: crate::MainWindow, spot: crate::spotify::SpotifyState) {
 // }
 
 pub fn player_event_handler(
-    ui: crate::MainWindow,
+    ui: slint::Weak<crate::MainWindow>,
     spot: crate::spotify::SpotifyState,
     rt: tokio::runtime::Handle,
 ) {
-    let ui_weak = ui.as_weak();
+    let ui_weak = ui;
     rt.spawn(async move {
         while let Some(e) = spot.player.get_player_event_channel().recv().await {
             match e {
@@ -63,29 +66,21 @@ pub fn player_event_handler(
                         }
                     }
                 }
-                librespot_playback::player::PlayerEvent::Paused {
-                    position_ms,
-                    play_request_id,
-                    track_id,
-                } => {
+                librespot_playback::player::PlayerEvent::Paused { position_ms, .. } => {
                     ui_weak
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
                             app.set_is_playing(false);
-                            app.set_current_time(position_ms as i64);
+                            app.set_current_time((position_ms/1000) as i32);
                         })
                         .unwrap();
                 }
-                librespot_playback::player::PlayerEvent::Playing {
-                    position_ms,
-                    play_request_id,
-                    track_id,
-                } => {
+                librespot_playback::player::PlayerEvent::Playing { position_ms, .. } => {
                     ui_weak
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
                             app.set_is_playing(true);
-                            app.set_current_time(position_ms as i64);
+                            app.set_current_time((position_ms/1000) as i32);
                         })
                         .unwrap();
                 }
@@ -93,7 +88,7 @@ pub fn player_event_handler(
                     ui_weak
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
-                            app.set_current_time(position_ms as i64);
+                            app.set_current_time((position_ms/1000) as i32);
                         })
                         .unwrap();
                 }
@@ -107,19 +102,15 @@ pub fn player_event_handler(
 
 fn set_track(app: &crate::AppState, track: Box<librespot_metadata::audio::item::AudioItem>) {
     app.set_song_title(track.name.into());
-    app.set_music_duration(track.duration_ms as i64);
+    app.set_music_duration((track.duration_ms/1000) as i32);
     match track.unique_fields {
-        librespot_metadata::audio::UniqueFields::Track {
-            artists,
-            album,
-            album_artists,
-            ..
-        } => {
+        librespot_metadata::audio::UniqueFields::Track { artists, album, .. } => {
+            use librespot_protocol::metadata::artist_with_role::ArtistRole;
             let mut composers = vec![];
             for artist in artists.0 {
-                if artist.role == librespot_protocol::metadata::artist_with_role::ArtistRole::ARTIST_ROLE_MAIN_ARTIST {
+                if artist.role == ArtistRole::ARTIST_ROLE_MAIN_ARTIST {
                     app.set_artist_name(artist.name.into());
-                } else if artist.role == librespot_protocol::metadata::artist_with_role::ArtistRole::ARTIST_ROLE_COMPOSER {
+                } else if artist.role == ArtistRole::ARTIST_ROLE_COMPOSER {
                     composers.push(artist.name);
                 }
             }

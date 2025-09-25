@@ -5,33 +5,32 @@ mod player;
 mod window;
 
 pub fn setup(
-    ui: crate::MainWindow,
+    ui: slint::Weak<crate::MainWindow>,
     spot: crate::spotify::SpotifyState,
     rt: tokio::runtime::Handle,
 ) {
-    initialize_app(ui.clone_strong(), spot.clone(), rt.clone());
-    window::drag_window(ui.clone_strong());
-    window::close_window(ui.clone_strong());
-    auth::start_oauth_login(ui.clone_strong(), spot.clone(), rt.clone());
-    player::play(ui.clone_strong(), spot.clone());
-    player::pause(ui.clone_strong(), spot.clone());
+    initialize_app(ui.clone(), spot.clone(), rt.clone());
+    window::drag_window(ui.clone());
+    window::close_window(ui.clone());
+    auth::start_oauth_login(ui.clone(), spot.clone(), rt.clone());
+    player::play(ui.clone(), spot.clone());
+    player::pause(ui.clone(), spot.clone());
     // player::volume_changed(ui.clone_strong(), spot.clone());
-    player::seek(ui.clone_strong(), spot.clone());
-    player::player_event_handler(ui.clone_strong(), spot.clone(), rt.clone());
+    player::seek(ui.clone(), spot.clone());
+    player::player_event_handler(ui.clone(), spot.clone(), rt.clone());
 }
 
 pub fn initialize_app(
-    ui: crate::MainWindow,
+    ui: slint::Weak<crate::MainWindow>,
     spot: crate::spotify::SpotifyState,
     rt: tokio::runtime::Handle,
 ) {
-    let ui_weak = ui.as_weak();
     rt.spawn(async move {
         let _ = spot
             .init()
             .await
             .inspect_err(|e| eprintln!("Failed to init spotify client: {}", e));
-        ui_weak
+        ui
             .upgrade_in_event_loop(|ui| {
                 let app = ui.global::<crate::AppState>();
                 app.set_loading(false);
@@ -43,7 +42,7 @@ pub fn initialize_app(
             .await
             .inspect_err(|e| eprintln!("Failed to init spotify web api: {}", e));
         if r.is_ok() {
-            ui_weak
+            ui
                 .upgrade_in_event_loop(|ui| {
                     let app = ui.global::<crate::AppState>();
                     app.set_loggedIn(true);

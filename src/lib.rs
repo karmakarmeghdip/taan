@@ -1,8 +1,3 @@
-#[cfg(target_os = "windows")]
-use i_slint_backend_winit::winit::platform::windows::BackdropType::TransientWindow;
-#[cfg(target_os = "windows")]
-use i_slint_backend_winit::winit::platform::windows::{Color, WindowAttributesExtWindows};
-
 slint::include_modules!();
 
 mod spotify;
@@ -12,10 +7,13 @@ pub fn main() -> anyhow::Result<()> {
     let mut backend = i_slint_backend_winit::Backend::new()?;
     #[cfg(target_os = "windows")]
     {
+        use i_slint_backend_winit::winit::platform::windows::{
+            BackdropType, Color, WindowAttributesExtWindows,
+        };
         backend.window_attributes_hook = Some(Box::new(|attrs| {
             attrs
                 .with_title_background_color(Some(Color::from_rgb(74, 62, 76)))
-                .with_system_backdrop(TransientWindow)
+                .with_system_backdrop(BackdropType::TransientWindow)
         }));
     }
     slint::platform::set_platform(Box::new(backend))?;
@@ -24,7 +22,7 @@ pub fn main() -> anyhow::Result<()> {
     let spot = rt.block_on(async { spotify::SpotifyState::default() });
     let ui = MainWindow::new()?;
 
-    state::setup(ui.clone_strong(), spot.clone(), rt.clone());
+    state::setup(ui.as_weak(), spot.clone(), rt.clone());
 
     ui.run()?;
     token.cancel();

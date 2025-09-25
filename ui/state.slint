@@ -15,11 +15,11 @@ export global AppState {
     in property <string> album: "Rokudenashi";
     in property <string> artist-name: "Rokudenashi";
     in property <string> composer: "ナユタン星人";
-    in property <duration> current-time: 0s; // in seconds
-    in property <duration> music-duration: 0s; // in seconds
+    in property <int> current-time: 0; // in seconds
+    in property <int> music-duration: 0; // in seconds
     in property <float> volume: 1.0; // 0.0 to 1.0
     callback play();
     callback pause();
     callback volume-changed(float);
-    callback seek(duration);
+    callback seek(int);
 }

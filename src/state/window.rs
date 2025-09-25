@@ -1,8 +1,9 @@
 use i_slint_backend_winit::WinitWindowAccessor;
 use slint::ComponentHandle;
 
-pub fn drag_window(ui: crate::MainWindow) {
-    let ui_weak = ui.as_weak();
+pub fn drag_window(ui: slint::Weak<crate::MainWindow>) {
+    let ui_weak = ui;
+    let ui = ui_weak.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_start_drag(move || {
         ui_weak.unwrap().window().with_winit_window(|win| {
@@ -12,7 +13,8 @@ pub fn drag_window(ui: crate::MainWindow) {
     });
 }
 
-pub fn close_window(ui: crate::MainWindow) {
+pub fn close_window(ui: slint::Weak<crate::MainWindow>) {
+    let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_close_window(move || {
         // ui_weak.unwrap().hide().unwrap();
