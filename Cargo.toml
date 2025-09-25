@@ -17,8 +17,7 @@ reqwest = "0.12.23"
 image = "0.25.8"
 rspotify = "0.15.1"
 chrono = "0.4.42"
-slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
-i-slint-backend-winit = "1.13.1"
+slint = { version = "1.13.1" }
 tokio = { version = "1", features = ["full"] }
 anyhow = "1.0.100"
 tokio-util = "0.7.16"
@@ -27,6 +26,10 @@ tokio-util = "0.7.16"
 slint = { version = "1.13.1", features = ["backend-android-activity-06"] }
 rspotify = { version = "0.15.1", features = ["reqwest-native-tls-vendored"] }
 reqwest = { version = "0.12.23", features = ["native-tls-vendored"] }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+i-slint-backend-winit = "1.13.1"
+slint = { version = "1.13.1", feature = ["renderer-skia", "backend-winit"] }
 
 [build-dependencies]
 slint-build = "1.13.1"

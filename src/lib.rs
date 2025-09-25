@@ -4,19 +4,19 @@ mod spotify;
 mod state;
 
 pub fn main() -> anyhow::Result<()> {
-    let mut backend = i_slint_backend_winit::Backend::new()?;
     #[cfg(target_os = "windows")]
     {
         use i_slint_backend_winit::winit::platform::windows::{
             BackdropType, Color, WindowAttributesExtWindows,
         };
+        let mut backend = i_slint_backend_winit::Backend::new()?;
         backend.window_attributes_hook = Some(Box::new(|attrs| {
             attrs
                 .with_title_background_color(Some(Color::from_rgb(74, 62, 76)))
                 .with_system_backdrop(BackdropType::TransientWindow)
         }));
+        slint::platform::set_platform(Box::new(backend))?;
     }
-    slint::platform::set_platform(Box::new(backend))?;
     let token = tokio_util::sync::CancellationToken::new();
     let (rt, join) = setup_rt(token.clone())?;
     let spot = rt.block_on(async { spotify::SpotifyState::default() });
