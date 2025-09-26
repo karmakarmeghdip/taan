@@ -1,7 +1,7 @@
 use image::EncodableLayout;
 use slint::ComponentHandle;
 
-pub fn play(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+pub fn play(ui: &slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
     let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_play(move || {
@@ -10,7 +10,7 @@ pub fn play(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifySta
     });
 }
 
-pub fn pause(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+pub fn pause(ui: &slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
     let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_pause(move || {
@@ -19,7 +19,7 @@ pub fn pause(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifySt
     });
 }
 
-pub fn seek(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
+pub fn seek(ui: &slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifyState) {
     let ui = ui.unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_seek(move |pos| {
@@ -39,11 +39,11 @@ pub fn seek(ui: slint::Weak<crate::MainWindow>, spot: crate::spotify::SpotifySta
 // }
 
 pub fn player_event_handler(
-    ui: slint::Weak<crate::MainWindow>,
+    ui: &slint::Weak<crate::MainWindow>,
     spot: crate::spotify::SpotifyState,
     rt: tokio::runtime::Handle,
 ) {
-    let ui_weak = ui;
+    let ui_weak = ui.clone();
     rt.spawn(async move {
         while let Some(e) = spot.player.get_player_event_channel().recv().await {
             match e {
@@ -59,9 +59,8 @@ pub fn player_event_handler(
                             eprintln!("Failed to upgrade ui weak reference: {}", e)
                         });
                     if let Some(url) = cover_url {
-                        let ui_weak = ui_weak.clone();
                         let url = url.to_string();
-                        if let Err(e) = get_cover_image(ui_weak, &url).await {
+                        if let Err(e) = get_cover_image(&ui_weak, &url).await {
                             eprintln!("Failed to get cover image: {}", e);
                         }
                     }
@@ -71,7 +70,7 @@ pub fn player_event_handler(
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
                             app.set_is_playing(false);
-                            app.set_current_time((position_ms/1000) as i32);
+                            app.set_current_time((position_ms / 1000) as i32);
                         })
                         .unwrap();
                 }
@@ -80,7 +79,7 @@ pub fn player_event_handler(
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
                             app.set_is_playing(true);
-                            app.set_current_time((position_ms/1000) as i32);
+                            app.set_current_time((position_ms / 1000) as i32);
                         })
                         .unwrap();
                 }
@@ -88,9 +87,15 @@ pub fn player_event_handler(
                     ui_weak
                         .upgrade_in_event_loop(move |ui| {
                             let app = ui.global::<crate::AppState>();
-                            app.set_current_time((position_ms/1000) as i32);
+                            app.set_current_time((position_ms / 1000) as i32);
                         })
                         .unwrap();
+                }
+                librespot_playback::player::PlayerEvent::TimeToPreloadNextTrack {
+                    track_id,
+                    ..
+                } => {
+                    spot.player.preload(track_id);
                 }
                 _ => {
                     println!("Player event received: {:#?}", e);
@@ -102,7 +107,7 @@ pub fn player_event_handler(
 
 fn set_track(app: &crate::AppState, track: Box<librespot_metadata::audio::item::AudioItem>) {
     app.set_song_title(track.name.into());
-    app.set_music_duration((track.duration_ms/1000) as i32);
+    app.set_music_duration((track.duration_ms / 1000) as i32);
     match track.unique_fields {
         librespot_metadata::audio::UniqueFields::Track { artists, album, .. } => {
             use librespot_protocol::metadata::artist_with_role::ArtistRole;
@@ -122,7 +127,10 @@ fn set_track(app: &crate::AppState, track: Box<librespot_metadata::audio::item::
     }
 }
 
-async fn get_cover_image(ui_weak: slint::Weak<crate::MainWindow>, url: &str) -> anyhow::Result<()> {
+async fn get_cover_image(
+    ui_weak: &slint::Weak<crate::MainWindow>,
+    url: &str,
+) -> anyhow::Result<()> {
     let img =
         image::load_from_memory(reqwest::get(url).await?.bytes().await?.as_bytes())?.into_rgba8();
     let buf = slint::SharedPixelBuffer::clone_from_slice(img.as_raw(), img.width(), img.height());

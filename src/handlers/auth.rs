@@ -1,7 +1,7 @@
 use slint::ComponentHandle;
 
 pub fn start_oauth_login(
-    ui: slint::Weak<crate::MainWindow>,
+    ui: &slint::Weak<crate::MainWindow>,
     spot: crate::spotify::SpotifyState,
     rt: tokio::runtime::Handle,
 ) {

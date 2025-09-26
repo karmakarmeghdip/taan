@@ -59,10 +59,8 @@ export component PlayerControls inherits Rectangle {
             running: AppState.is-playing;
             interval: 1s;
             triggered => {
-                debug("Updating Current time");
                 if (AppState.current-time < AppState.music-duration) {
                     AppState.current-time += 1;
-                    debug("Updated current time to " + AppState.current-time + "s");
                 }
             }
         }
