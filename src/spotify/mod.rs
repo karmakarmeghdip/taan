@@ -2,7 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use http_cache_reqwest::{CACacheManager, CacheMode, CacheOptions, HttpCache, HttpCacheOptions};
 use librespot_core::{
-    Error, Session, SessionConfig, SpotifyId, authentication::Credentials, cache::Cache,
+    authentication::Credentials, cache::Cache, Error, Session, SessionConfig, SpotifyId,
 };
 use librespot_playback::{
     audio_backend,
@@ -11,10 +11,10 @@ use librespot_playback::{
     player::Player,
 };
 use rspotify::{
-    AuthCodeSpotify, ClientError,
-    http::HttpError,
-    model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
+    http::HttpError, model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
+    AuthCodeSpotify,
+    ClientError,
 };
 
 const CACHE: &str = ".cache";
@@ -35,14 +35,14 @@ static OAUTH_SCOPES: &[&str] = &[
     "user-library-modify",
     "user-library-read",
     "user-modify",
-    "user-modify-playback-state",
+    "user-modify-playback-handlers",
     "user-modify-private",
     "user-personalized",
     "user-read-currently-playing",
     "user-read-email",
     "user-read-play-history",
     "user-read-playback-position",
-    "user-read-playback-state",
+    "user-read-playback-handlers",
     "user-read-private",
     "user-read-recently-played",
     "user-top-read",

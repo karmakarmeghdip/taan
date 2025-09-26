@@ -1,7 +1,7 @@
 slint::include_modules!();
 
+mod handlers;
 mod spotify;
-mod state;
 
 pub fn main() -> anyhow::Result<()> {
     #[cfg(target_os = "windows")]
@@ -22,7 +22,7 @@ pub fn main() -> anyhow::Result<()> {
     let spot = rt.block_on(async { spotify::SpotifyState::default() });
     let ui = MainWindow::new()?;
 
-    state::setup(ui.as_weak(), spot.clone(), rt.clone());
+    handlers::setup(ui.as_weak(), spot.clone(), rt.clone());
 
     ui.run()?;
     token.cancel();
