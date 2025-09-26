@@ -16,6 +16,7 @@ librespot-protocol = "0.7.1"
 reqwest = "0.12.23"
 image = "0.25.8"
 rspotify = { version = "0.15.1", features = ["reqwest-middleware"] }
+robius-directories = "5"
 chrono = "0.4.42"
 slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
 tokio = { version = "1", features = ["full"] }

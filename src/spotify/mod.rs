@@ -2,7 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use http_cache_reqwest::{CACacheManager, CacheMode, CacheOptions, HttpCache, HttpCacheOptions};
 use librespot_core::{
-    authentication::Credentials, cache::Cache, Error, Session, SessionConfig, SpotifyId,
+    Error, Session, SessionConfig, SpotifyId, authentication::Credentials, cache::Cache,
 };
 use librespot_playback::{
     audio_backend,
@@ -11,14 +11,11 @@ use librespot_playback::{
     player::Player,
 };
 use rspotify::{
-    http::HttpError, model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
+    AuthCodeSpotify, ClientError,
+    http::HttpError,
+    model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
-    AuthCodeSpotify,
-    ClientError,
 };
-
-const CACHE: &str = ".cache";
-const CACHE_FILES: &str = ".cache/files";
 
 pub const SPOTIFY_CLIENT_ID: &str = "65b708073fc0480ea92a077233ca87bd";
 
@@ -35,14 +32,14 @@ static OAUTH_SCOPES: &[&str] = &[
     "user-library-modify",
     "user-library-read",
     "user-modify",
-    "user-modify-playback-handlers",
+    "user-modify-playback-state",
     "user-modify-private",
     "user-personalized",
     "user-read-currently-playing",
     "user-read-email",
     "user-read-play-history",
     "user-read-playback-position",
-    "user-read-playback-handlers",
+    "user-read-playback-state",
     "user-read-private",
     "user-read-recently-played",
     "user-top-read",
@@ -56,8 +53,15 @@ pub struct SpotifyState {
 }
 impl Default for SpotifyState {
     fn default() -> SpotifyState {
-        let cache = Cache::new(Some(CACHE), Some(CACHE), Some(CACHE_FILES), None)
-            .expect("Failed to initialise cache, fatal");
+        let path = robius_directories::ProjectDirs::from("com", "meghdip", "taan")
+            .expect("Failed to get project directories, fatal");
+        let cache = Cache::new(
+            Some(path.cache_dir()),
+            Some(path.cache_dir()),
+            Some(&path.cache_dir().join("audio_cache")),
+            None,
+        )
+        .expect("Failed to initialise cache, fatal");
         let session = Session::new(SessionConfig::default(), Some(cache));
         let player = Player::new(
             PlayerConfig::default(),
@@ -73,7 +77,7 @@ impl Default for SpotifyState {
         let mut client = AuthCodeSpotify::default().with_middleware_arc(Arc::new(
             http_cache_reqwest::Cache(HttpCache {
                 mode: CacheMode::Default,
-                manager: CACacheManager::new(CACHE.into(), false),
+                manager: CACacheManager::new(path.cache_dir().join("http_cache"), false),
                 options: HttpCacheOptions {
                     cache_options: Some(CacheOptions {
                         shared: false,
