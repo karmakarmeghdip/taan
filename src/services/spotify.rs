@@ -17,6 +17,8 @@ use rspotify::{
     prelude::{BaseClient, OAuthClient},
 };
 
+pub static SPOTIFY_SERVICE: std::sync::OnceLock<SpotifyService> = std::sync::OnceLock::new();
+
 pub const SPOTIFY_CLIENT_ID: &str = "65b708073fc0480ea92a077233ca87bd";
 
 static OAUTH_SCOPES: &[&str] = &[
@@ -46,13 +48,13 @@ static OAUTH_SCOPES: &[&str] = &[
 ];
 
 #[derive(Clone)]
-pub struct SpotifyState {
+pub struct SpotifyService {
     session: Session,
     pub player: Arc<Player>,
     client: Arc<AuthCodeSpotify>,
 }
-impl Default for SpotifyState {
-    fn default() -> SpotifyState {
+impl Default for SpotifyService {
+    fn default() -> SpotifyService {
         let path = robius_directories::ProjectDirs::from("com", "meghdip", "taan")
             .expect("Failed to get project directories, fatal");
         let cache = Cache::new(
@@ -88,14 +90,17 @@ impl Default for SpotifyState {
             }),
         ));
         client.config.token_refreshing = false;
-        SpotifyState {
+        SpotifyService {
             session,
             player,
             client: Arc::new(client),
         }
     }
 }
-impl SpotifyState {
+impl SpotifyService {
+    pub fn register(self) {
+        SPOTIFY_SERVICE.set(self);
+    }
     pub async fn init(&self) -> anyhow::Result<()> {
         let creds = self
             .session
