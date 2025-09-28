@@ -17,8 +17,6 @@ use rspotify::{
     prelude::{BaseClient, OAuthClient},
 };
 
-pub static SPOTIFY_SERVICE: std::sync::OnceLock<SpotifyService> = std::sync::OnceLock::new();
-
 pub const SPOTIFY_CLIENT_ID: &str = "65b708073fc0480ea92a077233ca87bd";
 
 static OAUTH_SCOPES: &[&str] = &[
@@ -98,9 +96,6 @@ impl Default for SpotifyService {
     }
 }
 impl SpotifyService {
-    pub fn register(self) {
-        SPOTIFY_SERVICE.set(self);
-    }
     pub async fn init(&self) -> anyhow::Result<()> {
         let creds = self
             .session

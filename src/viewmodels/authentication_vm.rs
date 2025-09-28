@@ -1,9 +1,12 @@
 use slint::ComponentHandle;
 
-use crate::models::authentication;
+use crate::{
+    models::authentication,
+    services::{rt, spotify, ui_weak},
+};
 
 pub fn register_handlers() -> anyhow::Result<()> {
-    let ui = crate::UI.get().unwrap().unwrap();
+    let ui = ui_weak().unwrap();
     let app = ui.global::<crate::AppState>();
     app.on_login_clicked(move || {
         handle_login();
@@ -12,13 +15,12 @@ pub fn register_handlers() -> anyhow::Result<()> {
 }
 
 pub fn init() {
-    let rt = crate::RT.get().unwrap();
-    rt.spawn(async {
-        let spot = crate::services::spotify::SPOTIFY_SERVICE.get().unwrap();
-        spot.init()
+    rt().spawn(async {
+        spotify()
+            .init()
             .await
             .unwrap_or_else(|e| eprintln!("Failed to init spotify client: {}", e));
-        if let Err(e) = spot.web_auth().await {
+        if let Err(e) = spotify().web_auth().await {
             eprintln!("Failed to init spotify web api: {}", e);
             authentication::login_failed("Auto Login Failed").unwrap();
         } else {
@@ -29,11 +31,9 @@ pub fn init() {
 }
 
 pub fn handle_login() {
-    let rt = crate::RT.get().unwrap();
-    rt.spawn(async move {
-        let spot = crate::services::spotify::SPOTIFY_SERVICE.get().unwrap();
+    rt().spawn(async move {
         authentication::login_started().unwrap();
-        if let Err(e) = spot.auth().await {
+        if let Err(e) = spotify().auth().await {
             eprintln!("Failed to login: {}", e);
             authentication::login_failed("Failed to login").unwrap();
         } else {

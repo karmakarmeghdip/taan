@@ -4,9 +4,6 @@ mod models;
 mod services;
 mod viewmodels;
 
-pub static RT: std::sync::OnceLock<tokio::runtime::Handle> = std::sync::OnceLock::new();
-pub static UI: std::sync::OnceLock<slint::Weak<MainWindow>> = std::sync::OnceLock::new();
-
 pub fn main() -> anyhow::Result<()> {
     #[cfg(target_os = "windows")]
     {
@@ -22,19 +19,10 @@ pub fn main() -> anyhow::Result<()> {
         slint::platform::set_platform(Box::new(backend))?;
     }
     let token = tokio_util::sync::CancellationToken::new();
-    let join = setup_rt(token.clone())?;
-
     let ui = MainWindow::new()?;
+    let join = setup(token.clone(), ui.as_weak())?;
 
-    let ui_weak = ui.as_weak();
-    UI.set(ui_weak).unwrap_or_else(|_| {
-        eprintln!("Failed to set UI weak reference");
-    });
-
-    viewmodels::window_vm::register_handlers()?;
-    viewmodels::authentication_vm::init();
-    viewmodels::authentication_vm::register_handlers()?;
-    viewmodels::player_vm::register_handlers()?;
+    viewmodels::init()?;
 
     ui.run()?;
     token.cancel();
@@ -42,8 +30,9 @@ pub fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn setup_rt(
+fn setup(
     token: tokio_util::sync::CancellationToken,
+    ui_weak: slint::Weak<MainWindow>,
 ) -> tokio::io::Result<std::thread::JoinHandle<()>> {
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
@@ -53,10 +42,8 @@ fn setup_rt(
         rt.block_on(token.cancelled());
         println!("Tokio Thread closed");
     });
-    rt_handle.block_on(async {
-        services::spotify::SpotifyService::default().register();
-    });
-    RT.set(rt_handle).unwrap();
+    let spot = rt_handle.block_on(async { services::spotify::SpotifyService::default() });
+    services::init(spot, rt_handle, ui_weak);
     Ok(join)
 }
 

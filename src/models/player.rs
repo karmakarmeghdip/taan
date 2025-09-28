@@ -1,11 +1,11 @@
 use slint::ComponentHandle;
 
-use crate::UI;
+use crate::services::ui_weak;
 
 pub fn set_track_details(
     track: Box<librespot_metadata::audio::item::AudioItem>,
 ) -> anyhow::Result<()> {
-    UI.get().unwrap().upgrade_in_event_loop(move |ui| {
+    ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::AppState>();
         app.set_song_title(track.name.into());
         app.set_music_duration((track.duration_ms / 1000) as i32);
@@ -30,28 +30,28 @@ pub fn set_track_details(
     Ok(())
 }
 pub fn set_cover_art(img: slint::SharedPixelBuffer<slint::Rgba8Pixel>) -> anyhow::Result<()> {
-    UI.get().unwrap().upgrade_in_event_loop(move |ui| {
+    ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::AppState>();
         app.set_album_art(slint::Image::from_rgba8(img));
     })?;
     Ok(())
 }
 pub fn pause() -> anyhow::Result<()> {
-    UI.get().unwrap().upgrade_in_event_loop(move |ui| {
+    ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::AppState>();
         app.set_is_playing(false);
     })?;
     Ok(())
 }
 pub fn play() -> anyhow::Result<()> {
-    UI.get().unwrap().upgrade_in_event_loop(move |ui| {
+    ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::AppState>();
         app.set_is_playing(true);
     })?;
     Ok(())
 }
 pub fn set_position(position_ms: u32) -> anyhow::Result<()> {
-    UI.get().unwrap().upgrade_in_event_loop(move |ui| {
+    ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::AppState>();
         app.set_current_time((position_ms / 1000) as i32);
     })?;
