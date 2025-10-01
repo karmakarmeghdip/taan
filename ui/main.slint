@@ -31,10 +31,10 @@ export component MainWindow inherits Window {
         }
 
         // Show appropriate view based on authentication state
-    if !AppState.loggedIn: LoginWindow { }
+        if !AppState.loggedIn: LoginWindow { }
         if AppState.loggedIn: MusicPlayer { }
     }
-    
+
     // Initialize app on startup
     init => {
         AppState.initialize-app();
