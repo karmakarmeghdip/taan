@@ -34,13 +34,14 @@ fn setup(
     token: tokio_util::sync::CancellationToken,
     ui_weak: slint::Weak<MainWindow>,
 ) -> tokio::io::Result<std::thread::JoinHandle<()>> {
+    env_logger::init();
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()?;
     let rt_handle = rt.handle().clone();
     let join = std::thread::spawn(move || {
         rt.block_on(token.cancelled());
-        println!("Tokio Thread closed");
+        log::info!("Tokio Thread closed");
     });
     let spot = rt_handle.block_on(async { services::spotify::SpotifyService::default() });
     services::init(spot, rt_handle, ui_weak);

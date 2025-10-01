@@ -20,6 +20,8 @@ robius-directories = "5"
 chrono = "0.4.42"
 slint = { version = "1.13.1", features = ["renderer-skia", "backend-winit"] }
 tokio = { version = "1", features = ["full"] }
+log = "0.4"
+env_logger = "0.11"
 anyhow = "1"
 tokio-util = "0.7.16"
 http-cache-reqwest = "0.16.0"

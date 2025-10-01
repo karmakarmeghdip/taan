@@ -23,7 +23,7 @@ pub fn close() -> anyhow::Result<()> {
 pub fn drag_window() -> anyhow::Result<()> {
     ui_weak().unwrap().window().with_winit_window(|win| {
         win.drag_window()
-            .unwrap_or_else(|e| eprintln!("Failed to drag window: {}", e));
+            .unwrap_or_else(|e| log::error!("Failed to drag window: {}", e));
     });
     Ok(())
 }

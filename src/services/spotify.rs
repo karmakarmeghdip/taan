@@ -197,7 +197,7 @@ impl SpotifyService {
     pub fn load_track(&self, id: String) -> Result<(), Error> {
         let track_id = SpotifyId::from_uri(&id)?;
         self.player.load(track_id, false, 0);
-        println!("Loaded track {}", id);
+        log::info!("Loaded track {}", id);
         Ok(())
     }
 
@@ -231,7 +231,7 @@ impl SpotifyService {
         &self,
         url: String,
     ) -> anyhow::Result<slint::SharedPixelBuffer<slint::Rgba8Pixel>> {
-        println!("Fetching {}", url);
+        log::info!("Fetching {}", url);
         let img = image::load_from_memory(reqwest::get(url).await?.bytes().await?.as_bytes())?
             .into_rgba8();
         Ok(slint::SharedPixelBuffer::clone_from_slice(
@@ -245,7 +245,7 @@ impl SpotifyService {
             if let HttpError::StatusCode(res) = *e {
                 if res.status() == 401 {
                     self.web_auth().await.unwrap_or_else(|e| {
-                        eprintln!("Failed to refresh client: {}", e);
+                        log::error!("Failed to refresh client: {}", e);
                     });
                     return true;
                 }
@@ -256,7 +256,7 @@ impl SpotifyService {
                             .parse::<u64>()
                             .ok()
                     });
-                    println!("rate limit hit, waiting for {}", wait.unwrap_or_default());
+                    log::debug!("rate limit hit, waiting for {}", wait.unwrap_or_default());
                     tokio::time::sleep(Duration::from_secs(wait.unwrap_or_default())).await;
                     return true;
                 }

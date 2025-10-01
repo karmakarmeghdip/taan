@@ -19,12 +19,12 @@ pub fn init() {
         spotify()
             .init()
             .await
-            .unwrap_or_else(|e| eprintln!("Failed to init spotify client: {}", e));
+            .unwrap_or_else(|e| log::error!("Failed to init spotify client: {}", e));
         if let Err(e) = spotify().web_auth().await {
-            eprintln!("Failed to init spotify web api: {}", e);
+            log::error!("Failed to init spotify web api: {}", e);
             authentication::login_failed("Auto Login Failed").unwrap();
         } else {
-            println!("Successfuly logged in");
+            log::info!("Successfuly logged in");
             authentication::login_succeeded().unwrap();
         }
     });
@@ -34,10 +34,10 @@ pub fn handle_login() {
     rt().spawn(async move {
         authentication::login_started().unwrap();
         if let Err(e) = spotify().auth().await {
-            eprintln!("Failed to login: {}", e);
+            log::error!("Failed to login: {}", e);
             authentication::login_failed("Failed to login").unwrap();
         } else {
-            println!("Successfuly logged in");
+            log::info!("Successfuly logged in");
             authentication::login_succeeded().unwrap();
         }
     });

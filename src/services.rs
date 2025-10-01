@@ -16,7 +16,7 @@ pub fn init(
     SERVICES
         .set(Services { spotify, rt, ui })
         .unwrap_or_else(|_| {
-            eprintln!("Init must be called only once");
+            log::error!("Init must be called only once");
         });
 }
 
