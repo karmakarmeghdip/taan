@@ -1,2 +1,2 @@
 pub mod authentication;
-mod player;
+pub mod player;

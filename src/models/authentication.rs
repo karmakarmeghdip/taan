@@ -16,7 +16,7 @@ pub fn login_succeeded() -> anyhow::Result<()> {
 /**
  * Can be called from any thread
  */
-pub fn login_failed(error: &str) -> anyhow::Result<()> {
+pub fn login_failed(_error: &str) -> anyhow::Result<()> {
     ui_weak().upgrade_in_event_loop(|ui| {
         let app_state = ui.global::<crate::AppState>();
         app_state.set_loggedIn(false);

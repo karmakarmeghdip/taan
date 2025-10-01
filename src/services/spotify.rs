@@ -1,6 +1,9 @@
+#![allow(dead_code)]
+
 use std::{sync::Arc, time::Duration};
 
 use http_cache_reqwest::{CACacheManager, CacheMode, CacheOptions, HttpCache, HttpCacheOptions};
+use image::EncodableLayout;
 use librespot_core::{
     Error, Session, SessionConfig, SpotifyId, authentication::Credentials, cache::Cache,
 };
@@ -12,7 +15,7 @@ use librespot_playback::{
 };
 use rspotify::{
     AuthCodeSpotify, ClientError,
-    http::HttpError,
+    http::{BaseHttpClient, HttpError},
     model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
 };
@@ -64,7 +67,10 @@ impl Default for SpotifyService {
         .expect("Failed to initialise cache, fatal");
         let session = Session::new(SessionConfig::default(), Some(cache));
         let player = Player::new(
-            PlayerConfig::default(),
+            PlayerConfig {
+                position_update_interval: Some(Duration::from_secs(1)),
+                ..Default::default()
+            },
             session.clone(),
             Box::new(NoOpVolume),
             || {
@@ -104,6 +110,7 @@ impl SpotifyService {
             .credentials()
             .ok_or(Error::unauthenticated("No cache in session"))?;
         self.session.connect(creds, true).await?;
+        self.load_track("spotify:track:30aPCMAtkH6Cf5ejzY4cE4".to_string())?;
         Ok(())
     }
     pub async fn connect(&self, creds: Credentials) -> anyhow::Result<()> {
@@ -211,6 +218,27 @@ impl SpotifyService {
             .await
             .map_err(|e| Error::unauthenticated(format!("Failed to authenticate: {}", e)))?;
         Ok(())
+    }
+    pub async fn on_player_event<F>(&self, callback: F)
+    where
+        F: Fn(librespot_playback::player::PlayerEvent),
+    {
+        while let Some(e) = self.player.get_player_event_channel().recv().await {
+            callback(e);
+        }
+    }
+    pub async fn fetch_cover_art(
+        &self,
+        url: String,
+    ) -> anyhow::Result<slint::SharedPixelBuffer<slint::Rgba8Pixel>> {
+        println!("Fetching {}", url);
+        let img = image::load_from_memory(reqwest::get(url).await?.bytes().await?.as_bytes())?
+            .into_rgba8();
+        Ok(slint::SharedPixelBuffer::clone_from_slice(
+            img.as_raw(),
+            img.width(),
+            img.height(),
+        ))
     }
     async fn requires_refresh(&self, e: ClientError) -> bool {
         if let ClientError::Http(e) = e {

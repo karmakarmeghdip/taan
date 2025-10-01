@@ -55,15 +55,15 @@ export component PlayerControls inherits Rectangle {
             }
         }
 
-        Timer {
-            running: AppState.is-playing;
-            interval: 1s;
-            triggered => {
-                if (AppState.current-time < AppState.music-duration) {
-                    AppState.current-time += 1;
-                }
-            }
-        }
+        // Timer {
+        //     running: AppState.is-playing;
+        //     interval: 1s;
+        //     triggered => {
+        //         if (AppState.current-time < AppState.music-duration) {
+        //             AppState.current-time += 1;
+        //         }
+        //     }
+        // }
 
         // Additional controls section
         additional-controls := AdditionalControls {
