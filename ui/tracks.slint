@@ -1,0 +1,281 @@
+import { ScrollView } from "std-widgets.slint";
+import { Colors, Spacing, BorderRadius } from "components/common/colors.slint";
+import { MusicPlayer } from "player.slint";
+
+struct TrackData {
+    title: string,
+    artist: string,
+    album: string,
+    duration: string,
+    initial: string,
+}
+
+component TrackRow inherits Rectangle {
+    in property <string> title;
+    in property <string> artist;
+    in property <string> album;
+    in property <string> duration-text;
+    in property <string> initial;
+    in property <bool> active: false;
+    in property <bool> show-album: true;
+    callback clicked();
+    height: 68px;
+    border-radius: BorderRadius.lg;
+    background: active ? rgba(255, 255, 255, 0.10) : area.has-hover ? rgba(255, 255, 255, 0.06) : transparent;
+    HorizontalLayout {
+        width: parent.width;
+        height: parent.height;
+        padding-left: Spacing.lg;
+        padding-right: Spacing.sm;
+        spacing: Spacing.lg;
+        alignment: LayoutAlignment.space-between;
+        HorizontalLayout {
+            alignment: LayoutAlignment.start;
+            spacing: Spacing.lg;
+            Rectangle {
+                width: 48px;
+                Rectangle {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: BorderRadius.md;
+                    background: Colors.background-surface;
+                    Text {
+                        text: initial;
+                        color: Colors.text-primary;
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            VerticalLayout {
+                spacing: Spacing.xs;
+                vertical-stretch: 0;
+                alignment: LayoutAlignment.space-evenly;
+                Text {
+                    text: title;
+                    color: active ? Colors.success : Colors.text-primary;
+                    font-size: 17px;
+                    font-weight: 600;
+                    horizontal-alignment: left;
+                }
+
+                Text {
+                    text: artist;
+                    color: Colors.text-secondary;
+                    font-size: 13px;
+                    horizontal-alignment: left;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: LayoutAlignment.end;
+            spacing: Spacing.xl;
+            if show-album: Text {
+                vertical-alignment: center;
+                color: Colors.text-secondary;
+                text: album;
+                font-size: 13px;
+                horizontal-stretch: 0;
+                horizontal-alignment: left;
+            }
+            Text {
+                vertical-alignment: center;
+                color: Colors.text-secondary;
+                text: duration-text;
+                font-size: 13px;
+                horizontal-stretch: 0;
+                horizontal-alignment: left;
+            }
+        }
+    }
+
+    area := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        mouse-cursor: pointer;
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+component SearchButton inherits Rectangle {
+    callback clicked();
+    width: 36px;
+    height: 36px;
+    border-radius: BorderRadius.full;
+    background: area.has-hover ? Colors.icon-button-background-hover : Colors.icon-button-background-default;
+    Rectangle {
+        width: 14px;
+        height: 14px;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        border-width: 2px;
+        border-radius: self.width / 2;
+        border-color: Colors.icon-secondary;
+        background: transparent;
+    }
+
+    Path {
+        width: 10px;
+        height: 10px;
+        x: parent.width / 2 + 5px;
+        y: parent.height / 2 + 5px;
+        stroke: Colors.icon-secondary;
+        stroke-width: 2px;
+        commands: "M 0 0 L 10 10";
+    }
+
+    area := TouchArea {
+        width: parent.width;
+        height: parent.height;
+        mouse-cursor: pointer;
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+export component SavedTracks inherits Rectangle {
+    background: @linear-gradient(160deg, #4a3e4c 0%, #3b323d 100%);
+    border-radius: BorderRadius.xl;
+    clip: true;
+    preferred-width: 1080px;
+    preferred-height: 640px;
+    in-out property <[TrackData]> track-model: [
+        {
+            title: "Albireo",
+            artist: "Rokudenashi",
+            album: "Nightbound",
+            duration: "3:15",
+            initial: "A"
+        },
+        {
+            title: "Starlight Echoes",
+            artist: "Cosmic Drift",
+            album: "Orbital Journeys",
+            duration: "4:22",
+            initial: "T"
+        },
+        {
+            title: "City of Ghosts",
+            artist: "Neon Shadow",
+            album: "Cybernetic Dreams",
+            duration: "3:58",
+            initial: "A"
+        },
+        {
+            title: "River of Serenity",
+            artist: "Aqueous",
+            album: "Liquid Meditations",
+            duration: "5:10",
+            initial: "A"
+        },
+        {
+            title: "Forgotten Trail",
+            artist: "Wilder",
+            album: "Echoes of the Wild",
+            duration: "2:45",
+            initial: "N"
+        },
+        {
+            title: "Lunar Tides",
+            artist: "Celeste",
+            album: "Celestial Sphere",
+            duration: "4:01",
+            initial: "T"
+        },
+        {
+            title: "Volcanic Heart",
+            artist: "Magma Flow",
+            album: "Eruption",
+            duration: "3:33",
+            initial: "A"
+        },
+    ];
+    in-out property <int> selected-index: 2;
+    property <bool> show-album-column: root.width > 680px;
+    HorizontalLayout {
+        width: parent.width;
+        height: parent.height;
+        padding: Spacing.xl;
+        spacing: Spacing.xl;
+
+        // Playlist column
+        playlist-panel := Rectangle {
+            horizontal-stretch: 2;
+            min-width: 450px;
+            border-radius: BorderRadius.lg;
+            background: rgba(0, 0, 0, 0.08);
+            VerticalLayout {
+                width: parent.width;
+                height: parent.height;
+                padding: Spacing.xl;
+                spacing: Spacing.lg;
+                HorizontalLayout {
+                    spacing: Spacing.lg;
+                    vertical-stretch: 0;
+                    Text {
+                        text: "Liked Songs";
+                        color: Colors.text-primary;
+                        font-size: 26px;
+                        font-weight: 700;
+                    }
+
+                    Rectangle {
+                        horizontal-stretch: 1;
+                        height: 0px;
+                    }
+
+                    SearchButton {
+                        clicked => { /* reserved for future search */ }
+                    }
+                }
+
+                ScrollView {
+                    vertical-stretch: 1;
+                    viewport-height: list-content.preferred-height;
+                    list-content := VerticalLayout {
+                        width: parent.width;
+                        spacing: Spacing.sm;
+                        for track[idx] in root.track-model: TrackRow {
+                            width: parent.width - Spacing.lg;
+                            title: track.title;
+                            artist: track.artist;
+                            album: track.album;
+                            duration-text: track.duration;
+                            initial: track.initial;
+                            active: idx == root.selected-index;
+                            show-album: root.show-album-column;
+                            clicked => {
+                                root.selected-index = idx;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Player column
+        player-panel := Rectangle {
+            horizontal-stretch: 1;
+            min-height: 320px;
+            min-width: 300px;
+            border-radius: BorderRadius.lg;
+            background: rgba(0, 0, 0, 0.08);
+            Rectangle {
+                width: 1px;
+                height: parent.height;
+                background: Colors.border-default;
+                x: 0px;
+            }
+
+            MusicPlayer {
+                width: parent.width;
+                height: parent.height;
+            }
+        }
+    }
+}

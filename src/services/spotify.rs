@@ -15,7 +15,7 @@ use librespot_playback::{
 };
 use rspotify::{
     AuthCodeSpotify, ClientError,
-    http::{BaseHttpClient, HttpError},
+    http::HttpError,
     model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
     prelude::{BaseClient, OAuthClient},
 };

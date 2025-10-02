@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Taan - Your Music Reimagined</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                font-family: "Inter", sans-serif;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            .bg-player-gradient {
+                background: linear-gradient(160deg, #4a3e4c 0%, #3b323d 100%);
+            }
+            /* Custom scrollbar for the playlist */
+            .playlist-scrollbar::-webkit-scrollbar {
+                width: 8px;
+            }
+            .playlist-scrollbar::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+            .playlist-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+            }
+            .playlist-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+        <!-- Main App Container -->
+        <div
+            class="w-full max-w-7xl h-[85vh] min-h-[600px] bg-player-gradient rounded-2xl shadow-2xl text-white flex flex-col lg:flex-row overflow-hidden resize"
+        >
+            <!-- Left Side: Playlist -->
+            <div class="w-full lg:w-2/3 flex flex-col h-1/2 lg:h-full">
+                <!-- Header -->
+                <header class="p-4 sm:p-6 border-b border-white/10 shrink-0">
+                    <div class="flex items-center justify-between">
+                        <h1
+                            class="text-2xl sm:text-3xl font-bold tracking-tight"
+                        >
+                            Liked Songs
+                        </h1>
+                        <button
+                            class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i
+                                data-lucide="search"
+                                class="w-5 h-5 sm:w-6 sm:h-6 text-white/80"
+                            ></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Track List -->
+                <div class="flex-grow overflow-y-auto p-3 playlist-scrollbar">
+                    <div class="space-y-1">
+                        <!-- Mock Tracks -->
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <img
+                                src="https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">Albireo</p>
+                                <p class="text-sm text-gray-400">Rokudenashi</p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                夜紛い
+                            </div>
+                            <p class="text-sm text-gray-400">3:15</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/3b323d/ffffff?text=T"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">
+                                    Starlight Echoes
+                                </p>
+                                <p class="text-sm text-gray-400">
+                                    Cosmic Drift
+                                </p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Orbital Journeys
+                            </div>
+                            <p class="text-sm text-gray-400">4:22</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group bg-white/5"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/4a3e4c/ffffff?text=A"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-green-400">
+                                    City of Ghosts
+                                </p>
+                                <p class="text-sm text-green-400/80">
+                                    Neon Shadow
+                                </p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Cybernetic Dreams
+                            </div>
+                            <p class="text-sm text-gray-400">3:58</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/5a4e5c/ffffff?text=A"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">
+                                    River of Serenity
+                                </p>
+                                <p class="text-sm text-gray-400">Aqueous</p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Liquid Meditations
+                            </div>
+                            <p class="text-sm text-gray-400">5:10</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/6a5e6c/ffffff?text=N"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">
+                                    Forgotten Trail
+                                </p>
+                                <p class="text-sm text-gray-400">Wilder</p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Echoes of the Wild
+                            </div>
+                            <p class="text-sm text-gray-400">2:45</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/7a6e7c/ffffff?text=T"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">
+                                    Lunar Tides
+                                </p>
+                                <p class="text-sm text-gray-400">Celeste</p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Celestial Sphere
+                            </div>
+                            <p class="text-sm text-gray-400">4:01</p>
+                        </div>
+                        <div
+                            class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                        >
+                            <img
+                                src="https://placehold.co/100x100/8a7e8c/ffffff?text=A"
+                                alt="Album Art"
+                                class="w-12 h-12 rounded-md object-cover mr-4"
+                            />
+                            <div class="flex-grow">
+                                <p class="font-semibold text-white">
+                                    Volcanic Heart
+                                </p>
+                                <p class="text-sm text-gray-400">Magma Flow</p>
+                            </div>
+                            <div
+                                class="hidden md:block text-sm text-gray-400 mr-6"
+                            >
+                                Eruption
+                            </div>
+                            <p class="text-sm text-gray-400">3:33</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Player -->
+            <div
+                class="w-full lg:w-1/3 flex flex-col h-1/2 lg:h-full border-t lg:border-t-0 lg:border-l border-white/10 p-4 sm:p-6"
+            >
+                <div
+                    class="flex-1 flex flex-col items-center justify-center text-center p-4 min-h-0"
+                >
+                    <!-- Album Art -->
+                    <div class="w-full max-w-[280px] mb-4">
+                        <img
+                            src="https://placehold.co/300x300/4a3e4c/ffffff?text=A"
+                            alt="Album Art"
+                            class="w-full h-auto object-contain rounded-lg shadow-2xl"
+                        />
+                    </div>
+
+                    <!-- Song Info -->
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-white">
+                            City of Ghosts
+                        </h2>
+                        <p class="text-md text-gray-300">Neon Shadow</p>
+                        <p class="text-sm text-gray-400">Cybernetic Dreams</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full max-w-sm mx-auto text-gray-400">
+                        <div class="w-full h-2 bg-white/10 rounded-full mb-2">
+                            <div
+                                class="h-2 bg-green-400 rounded-full"
+                                style="width: 45%"
+                            ></div>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>1:47</span>
+                            <span>3:58</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Controls -->
+                <div class="shrink-0 flex flex-col items-center space-y-4">
+                    <!-- Main Controls -->
+                    <div class="flex items-center justify-center space-x-4">
+                        <button
+                            class="p-3 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="skip-back" class="w-7 h-7"></i>
+                        </button>
+                        <button
+                            class="p-5 rounded-full bg-white/90 text-black hover:bg-white transition-transform transform hover:scale-105 shadow-lg"
+                        >
+                            <i data-lucide="pause" class="w-8 h-8"></i>
+                        </button>
+                        <button
+                            class="p-3 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="skip-forward" class="w-7 h-7"></i>
+                        </button>
+                    </div>
+
+                    <!-- Bottom Controls -->
+                    <div
+                        class="w-full max-w-sm mx-auto flex justify-between items-center text-white/70"
+                    >
+                        <button
+                            class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="volume-2" class="w-5 h-5"></i>
+                        </button>
+                        <button
+                            class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="shuffle" class="w-5 h-5"></i>
+                        </button>
+                        <button
+                            class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="repeat" class="w-5 h-5"></i>
+                        </button>
+                        <button
+                            class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <i data-lucide="list-music" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            lucide.createIcons();
+        </script>
+    </body>
+</html>

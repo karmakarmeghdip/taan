@@ -36,15 +36,3 @@ pub fn login_started() -> anyhow::Result<()> {
     })?;
     Ok(())
 }
-/**
- * Can be called from any thread
- */
-pub fn logout() -> anyhow::Result<()> {
-    ui_weak().upgrade_in_event_loop(|ui| {
-        let app_state = ui.global::<crate::AppState>();
-        app_state.set_loggedIn(false);
-        app_state.set_loading(false);
-        app_state.set_login_in_progress(false);
-    })?;
-    Ok(())
-}

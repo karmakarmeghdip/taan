@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Playlist - Taan</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                font-family: "Inter", sans-serif;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            .bg-player-gradient {
+                background: linear-gradient(160deg, #4a3e4c 0%, #3b323d 100%);
+            }
+            /* Custom scrollbar for a more integrated look */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+        <!-- Playlist Container -->
+        <div
+            class="w-full max-w-4xl h-[80vh] min-h-[480px] bg-player-gradient rounded-2xl shadow-2xl text-white flex flex-col resize overflow-hidden"
+        >
+            <!-- Header -->
+            <header class="p-6 border-b border-white/10 shrink-0">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-3xl font-bold tracking-tight">
+                        Liked Songs
+                    </h1>
+                    <button
+                        class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                        <i
+                            data-lucide="search"
+                            class="w-6 h-6 text-white/80"
+                        ></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Track List -->
+            <div class="flex-grow overflow-y-auto p-3">
+                <div class="space-y-1">
+                    <!-- Track Item Template -->
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://i.scdn.co/image/ab67616d00001e02f6ccb29fbda0541861558a94"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">Albireo</p>
+                            <p class="text-sm text-gray-400">Rokudenashi</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            夜紛い
+                        </div>
+                        <p class="text-sm text-gray-400">3:15</p>
+                    </div>
+
+                    <!-- More Mock Tracks -->
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/3b323d/ffffff?text=T"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">
+                                Starlight Echoes
+                            </p>
+                            <p class="text-sm text-gray-400">Cosmic Drift</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Orbital Journeys
+                        </div>
+                        <p class="text-sm text-gray-400">4:22</p>
+                    </div>
+
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group bg-white/5"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/4a3e4c/ffffff?text=A"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-green-400">
+                                Now Playing: City of Ghosts
+                            </p>
+                            <p class="text-sm text-green-400/80">Neon Shadow</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Cybernetic Dreams
+                        </div>
+                        <p class="text-sm text-gray-400">3:58</p>
+                    </div>
+
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/5a4e5c/ffffff?text=A"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">
+                                River of Serenity
+                            </p>
+                            <p class="text-sm text-gray-400">Aqueous</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Liquid Meditations
+                        </div>
+                        <p class="text-sm text-gray-400">5:10</p>
+                    </div>
+
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/6a5e6c/ffffff?text=N"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">
+                                Forgotten Trail
+                            </p>
+                            <p class="text-sm text-gray-400">Wilder</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Echoes of the Wild
+                        </div>
+                        <p class="text-sm text-gray-400">2:45</p>
+                    </div>
+                    <!-- Add 10 more mock tracks to show scrolling -->
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/7a6e7c/ffffff?text=T"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">Lunar Tides</p>
+                            <p class="text-sm text-gray-400">Celeste</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Celestial Sphere
+                        </div>
+                        <p class="text-sm text-gray-400">4:01</p>
+                    </div>
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/8a7e8c/ffffff?text=A"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">
+                                Volcanic Heart
+                            </p>
+                            <p class="text-sm text-gray-400">Magma Flow</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Eruption
+                        </div>
+                        <p class="text-sm text-gray-400">3:33</p>
+                    </div>
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/9a8e9c/ffffff?text=A"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">Glacial Pace</p>
+                            <p class="text-sm text-gray-400">Icebound</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            The Permafrost
+                        </div>
+                        <p class="text-sm text-gray-400">6:20</p>
+                    </div>
+                    <div
+                        class="flex items-center p-3 rounded-lg hover:bg-white/10 transition-colors cursor-pointer group"
+                    >
+                        <img
+                            src="https://placehold.co/100x100/aa9eac/ffffff?text=N"
+                            alt="Album Art"
+                            class="w-12 h-12 rounded-md object-cover mr-4"
+                        />
+                        <div class="flex-grow">
+                            <p class="font-semibold text-white">
+                                Sun-Kissed Dune
+                            </p>
+                            <p class="text-sm text-gray-400">Mirage</p>
+                        </div>
+                        <div class="hidden md:block text-sm text-gray-400 mr-6">
+                            Desert Whispers
+                        </div>
+                        <p class="text-sm text-gray-400">3:12</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            lucide.createIcons();
+        </script>
+    </body>
+</html>
