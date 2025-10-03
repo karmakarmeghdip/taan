@@ -3,9 +3,10 @@ import { LoginWindow } from "login.slint";
 import { CloseButton } from "components/common/close_button.slint";
 import { Colors } from "components/common/colors.slint";
 import "../resources/fonts/Inter-Regular.ttf";
-import { AppState } from "state.slint";
+import { WindowState, AuthenticationState } from "state.slint";
+export { PlayerState, WindowState, AuthenticationState, PlaylistsState, TracksState } from "state.slint";
 
-export { AppState }
+
 
 export component MainWindow inherits Window {
     title: "Taan";
@@ -19,24 +20,24 @@ export component MainWindow inherits Window {
         HorizontalLayout {
             TouchArea {
                 moved => {
-                    AppState.start-drag();
+                    WindowState.start-drag();
                 }
             }
 
             close-button := CloseButton {
                 close-clicked => {
-                    AppState.close-window();
+                    WindowState.close-window();
                 }
             }
         }
 
         // Show appropriate view based on authentication state
-        if !AppState.loggedIn: LoginWindow { }
-        if AppState.loggedIn: MusicPlayer { }
+        if !AuthenticationState.loggedIn: LoginWindow { }
+        if AuthenticationState.loggedIn: MusicPlayer { }
     }
 
     // Initialize app on startup
     init => {
-        AppState.initialize-app();
+        WindowState.initialize-app();
     }
 }

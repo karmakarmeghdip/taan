@@ -5,7 +5,7 @@ use crate::services::ui_weak;
 
 pub fn register_handlers() -> anyhow::Result<()> {
     let ui = ui_weak().unwrap();
-    let app = ui.global::<crate::AppState>();
+    let app = ui.global::<crate::WindowState>();
 
     app.on_close_window(move || {
         close().unwrap();

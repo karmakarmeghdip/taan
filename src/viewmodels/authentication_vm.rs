@@ -7,7 +7,7 @@ use crate::{
 
 pub fn register_handlers() -> anyhow::Result<()> {
     let ui = ui_weak().unwrap();
-    let app = ui.global::<crate::AppState>();
+    let app = ui.global::<crate::AuthenticationState>();
     app.on_login_clicked(move || {
         handle_login();
     });

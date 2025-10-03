@@ -6,10 +6,10 @@ use slint::ComponentHandle;
  */
 pub fn login_succeeded() -> anyhow::Result<()> {
     ui_weak().upgrade_in_event_loop(|ui| {
-        let app_state = ui.global::<crate::AppState>();
-        app_state.set_loggedIn(true);
-        app_state.set_loading(false);
-        app_state.set_login_in_progress(false);
+        let auth_state = ui.global::<crate::AuthenticationState>();
+        auth_state.set_loggedIn(true);
+        auth_state.set_loading(false);
+        auth_state.set_login_in_progress(false);
     })?;
     Ok(())
 }
@@ -18,10 +18,10 @@ pub fn login_succeeded() -> anyhow::Result<()> {
  */
 pub fn login_failed(_error: &str) -> anyhow::Result<()> {
     ui_weak().upgrade_in_event_loop(|ui| {
-        let app_state = ui.global::<crate::AppState>();
-        app_state.set_loggedIn(false);
-        app_state.set_loading(false);
-        app_state.set_login_in_progress(false);
+        let auth_state = ui.global::<crate::AuthenticationState>();
+        auth_state.set_loggedIn(false);
+        auth_state.set_loading(false);
+        auth_state.set_login_in_progress(false);
         // TODO: Add error handling in UI
     })?;
     Ok(())
@@ -31,8 +31,8 @@ pub fn login_failed(_error: &str) -> anyhow::Result<()> {
  */
 pub fn login_started() -> anyhow::Result<()> {
     ui_weak().upgrade_in_event_loop(|ui| {
-        let app_state = ui.global::<crate::AppState>();
-        app_state.set_login_in_progress(true);
+        let auth_state = ui.global::<crate::AuthenticationState>();
+        auth_state.set_login_in_progress(true);
     })?;
     Ok(())
 }

@@ -13,17 +13,20 @@ struct Track {
     cover-art: image,
 }
 
-export global AppState {
-    // Window state
+export global WindowState {
     callback start-drag();
     callback close-window();
     callback initialize-app();
-    // Authentication state
+}
+
+export global AuthenticationState {
     in property <bool> loading: true;
     in property <bool> loggedIn: false;
     in property <bool> login-in-progress: false;
     callback login-clicked();
-    // Player state
+}
+
+export global PlayerState {
     in property <bool> is-playing: false;
     in property <string> song-title: "Nothing Playing";
     in property <image> album-art: @image-url("../resources/album-art-placeholder.svg");
@@ -42,12 +45,16 @@ export global AppState {
     callback shuffle-clicked();
     callback repeat-clicked();
     callback seek(int);
-    // Playlists state
+}
+
+export global PlaylistsState {
     in property <Playlist> playlists;
     callback playlist-clicked(string);
     callback fetch-playlists();
     in property <bool> fetching-playlists: false;
-    // Tracks state
+}
+
+export global TracksState {
     in property <string> current-playlist-id: "";
     in property <bool> fetching-tracks: false;
     in property <Track> tracks;

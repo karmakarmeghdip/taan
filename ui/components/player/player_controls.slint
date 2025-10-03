@@ -3,7 +3,7 @@ import { VolumeSlider } from "volume_slider.slint";
 import { SongInfo } from "song_info.slint";
 import { MainControls } from "main_controls.slint";
 import { AdditionalControls } from "additional_controls.slint";
-import { AppState } from "../../state.slint";
+import { PlayerState } from "../../state.slint";
 
 export component PlayerControls inherits Rectangle {
     vertical-stretch: 0; // Fixed size, won't shrink
@@ -22,35 +22,33 @@ export component PlayerControls inherits Rectangle {
 
         // Song information section
         song-info := SongInfo {
-            song-title: AppState.song-title;
-            artist-name: AppState.artist-name;
-            composer: AppState.composer;
+            song-title: PlayerState.song-title;
+            artist-name: PlayerState.artist-name;
+            composer: PlayerState.composer;
         }
 
         // Main controls section
         main-controls := MainControls {
-            is-playing: AppState.is-playing;
+            is-playing: PlayerState.is-playing;
             previous-clicked => {
-                 // AppState.previous-clicked();
             }
             play-pause-clicked => {
-                if (AppState.is-playing) {
-                    AppState.pause();
+                if (PlayerState.is-playing) {
+                    PlayerState.pause();
                 } else {
-                    AppState.play();
+                    PlayerState.play();
                 }
             }
             next-clicked => {
-                // AppState.next-clicked();
             }
         }
 
         // Progress bar section
         progress-bar := ProgressBar {
-            current-time <=> AppState.current-time;
-            music-duration: AppState.music-duration;
+            current-time <=> PlayerState.current-time;
+            music-duration: PlayerState.music-duration;
             seek(value) => {
-                AppState.seek(value);
+                PlayerState.seek(value);
                 debug(value);
             }
         }
@@ -58,16 +56,12 @@ export component PlayerControls inherits Rectangle {
         // Additional controls section
         additional-controls := AdditionalControls {
             stop-clicked => {
-                // AppState.stop-clicked();
             }
             shuffle-clicked => {
-                // AppState.shuffle-clicked();
             }
             repeat-clicked => {
-                // AppState.repeat-clicked();
             }
             playlist-clicked => {
-                // AppState.playlist-clicked();
             }
         }
     }

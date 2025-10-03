@@ -1,6 +1,6 @@
 import { Colors, Spacing, BorderRadius, Animations } from "components/common/colors.slint";
 import { PrimaryButton, ButtonSize, ButtonShape } from "components/common/button.slint";
-import { AppState } from "state.slint";
+import { AuthenticationState } from "state.slint";
 
 export component LoginWindow {
 
@@ -43,12 +43,12 @@ export component LoginWindow {
 
         // Login button using PrimaryButton component
         login-button := PrimaryButton {
-            enabled: !AppState.login-in-progress || !AppState.loading;
+            enabled: !AuthenticationState.login-in-progress || !AuthenticationState.loading;
             width: 100%;
             height: 48px;
             clicked => {
                 // Trigger OAuth login through global state
-                AppState.login-clicked();
+                AuthenticationState.login-clicked();
             }
             Rectangle {
                 width: 100%;
@@ -57,7 +57,7 @@ export component LoginWindow {
 
                 // Override button states for Spotify branding
                 states [
-                    disabled when (AppState.login-in-progress || AppState.loading): {
+                    disabled when (AuthenticationState.login-in-progress || AuthenticationState.loading): {
                         opacity: Colors.opacity-disabled;
                     }
                 ]
@@ -76,7 +76,7 @@ export component LoginWindow {
 
                     Rectangle {
                         Text {
-                            text: (AppState.login-in-progress || AppState.loading) ? "Logging in..." : "Login with Spotify";
+                            text: (AuthenticationState.login-in-progress || AuthenticationState.loading) ? "Logging in..." : "Login with Spotify";
                             font-size: 18px;
                             font-weight: 700;
                             color: Colors.text-primary;
