@@ -15,7 +15,13 @@
         "title": "taan",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "transparent": true,
+        "windowEffects": {
+          "effects": [
+            "acrylic"
+          ]
+        }
       }
     ],
     "security": {

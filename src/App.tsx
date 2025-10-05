@@ -1,5 +1,6 @@
 import MusicPlayer, { PlaybackState, TrackInfo } from "./components/player/MusicPlayer";
 import "./App.css";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const track: TrackInfo = {
   title: "Albireo",
@@ -14,10 +15,13 @@ const playback: PlaybackState = {
   isPlaying: false,
   volume: 0.7,
 };
+const closeWindow = async () => {
+  await getCurrentWindow().close();
+}
 
 const App = () => (
   <div className="h-full w-full overflow-hidden font-inter text-slate-100 antialiased">
-    <MusicPlayer track={track} playback={playback} />
+    <MusicPlayer track={track} playback={playback} onClose={closeWindow} />
   </div>
 );
 
