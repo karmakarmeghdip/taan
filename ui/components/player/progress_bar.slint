@@ -1,9 +1,7 @@
 import { ProgressBar as CommonProgressBar } from "../common/slider.slint";
+import { Utils } from "../../utils.slint";
 
 export component ProgressBar {
-    pure function time-to-string(time: int) -> string {
-        return Math.floor(time / 60000) + ":" + Math.floor(Math.mod(time / 1000, 60));
-    }
     in-out property <int> current-time: 0;
     in-out property <int> music-duration: 0;
     property <float> progress: music-duration == 0 ? 0.0 : (current-time * 1.0) / music-duration;
@@ -14,8 +12,8 @@ export component ProgressBar {
         padding-bottom: 16px;
         CommonProgressBar {
             progress <=> root.progress;
-            current-time: time-to-string(root.current-time);
-            remaining-time: time-to-string(root.music-duration - root.current-time);
+            current-time: Utils.ms-to-string(root.current-time);
+            remaining-time: Utils.ms-to-string(root.music-duration - root.current-time);
             seek(value) => {
                 root.seek(value * root.music-duration);
             }

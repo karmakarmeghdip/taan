@@ -2,7 +2,7 @@ import { MusicPlayer } from "player.slint";
 import { LoginWindow } from "login.slint";
 import { CloseButton } from "components/common/close_button.slint";
 import { Colors } from "components/common/colors.slint";
-import "../resources/fonts/Inter-Regular.ttf";
+import "../resources/fonts/PaperMono-Regular.ttf";
 import { WindowState, AuthenticationState } from "state.slint";
 import { SavedTracks } from "tracks.slint";
 export { PlayerState, WindowState, AuthenticationState, PlaylistsState, TracksState } from "state.slint";
@@ -17,7 +17,7 @@ export component MainWindow inherits Window {
     no-frame: true;
     resize-border-width: 4px;
     background: Colors.background-primary;
-    default-font-family: "Inter";
+    default-font-family: "Paper Mono";
     VerticalLayout {
         HorizontalLayout {
             TouchArea {

@@ -10,6 +10,11 @@ pub fn register_handlers() -> anyhow::Result<()> {
             i.push_str(&s.chars().next().unwrap_or_default().to_string());
             i
         });
+        utils.on_ms_to_string(|ms| {
+            let seconds = (ms / 1000) % 60;
+            let minutes = (ms / 1000) / 60;
+            slint::SharedString::from(format!("{:02}:{:02}", minutes, seconds))
+        });
     })?;
     Ok(())
 }
