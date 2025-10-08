@@ -2,7 +2,7 @@ import { ProgressBar as CommonProgressBar } from "../common/slider.slint";
 
 export component ProgressBar {
     pure function time-to-string(time: int) -> string {
-        return Math.floor(time / 60) + ":" + Math.floor(Math.mod(time, 60));
+        return Math.floor(time / 60000) + ":" + Math.floor(Math.mod(time / 1000, 60));
     }
     in-out property <int> current-time: 0;
     in-out property <int> music-duration: 0;

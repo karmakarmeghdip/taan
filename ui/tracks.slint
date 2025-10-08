@@ -1,6 +1,8 @@
 import { ScrollView } from "std-widgets.slint";
 import { Colors, Spacing, BorderRadius } from "components/common/colors.slint";
 import { MusicPlayer } from "player.slint";
+import { TracksState } from "./state.slint";
+import { Utils } from "utils.slint";
 
 struct TrackData {
     title: string,
@@ -139,63 +141,10 @@ component SearchButton inherits Rectangle {
 }
 
 export component SavedTracks inherits Rectangle {
-    background: @linear-gradient(160deg, #4a3e4c 0%, #3b323d 100%);
-    border-radius: BorderRadius.xl;
     clip: true;
     preferred-width: 1080px;
     preferred-height: 640px;
-    in-out property <[TrackData]> track-model: [
-        {
-            title: "Albireo",
-            artist: "Rokudenashi",
-            album: "Nightbound",
-            duration: "3:15",
-            initial: "A"
-        },
-        {
-            title: "Starlight Echoes",
-            artist: "Cosmic Drift",
-            album: "Orbital Journeys",
-            duration: "4:22",
-            initial: "T"
-        },
-        {
-            title: "City of Ghosts",
-            artist: "Neon Shadow",
-            album: "Cybernetic Dreams",
-            duration: "3:58",
-            initial: "A"
-        },
-        {
-            title: "River of Serenity",
-            artist: "Aqueous",
-            album: "Liquid Meditations",
-            duration: "5:10",
-            initial: "A"
-        },
-        {
-            title: "Forgotten Trail",
-            artist: "Wilder",
-            album: "Echoes of the Wild",
-            duration: "2:45",
-            initial: "N"
-        },
-        {
-            title: "Lunar Tides",
-            artist: "Celeste",
-            album: "Celestial Sphere",
-            duration: "4:01",
-            initial: "T"
-        },
-        {
-            title: "Volcanic Heart",
-            artist: "Magma Flow",
-            album: "Eruption",
-            duration: "3:33",
-            initial: "A"
-        },
-    ];
-    in-out property <int> selected-index: 2;
+    in-out property <string> selected-index: "";
     property <bool> show-album-column: root.width > 680px;
     HorizontalLayout {
         width: parent.width;
@@ -240,17 +189,17 @@ export component SavedTracks inherits Rectangle {
                     list-content := VerticalLayout {
                         width: parent.width;
                         spacing: Spacing.sm;
-                        for track[idx] in root.track-model: TrackRow {
+                        for track in TracksState.tracks: TrackRow {
                             width: parent.width - Spacing.lg;
                             title: track.title;
                             artist: track.artist;
                             album: track.album;
                             duration-text: track.duration;
-                            initial: track.initial;
-                            active: idx == root.selected-index;
+                            initial: Utils.first-char(track.title);
+                            active: track.id == root.selected-index;
                             show-album: root.show-album-column;
                             clicked => {
-                                root.selected-index = idx;
+                                root.selected-index = track.id;
                             }
                         }
                     }
@@ -265,12 +214,12 @@ export component SavedTracks inherits Rectangle {
             min-width: 300px;
             border-radius: BorderRadius.lg;
             background: rgba(0, 0, 0, 0.08);
-            Rectangle {
-                width: 1px;
-                height: parent.height;
-                background: Colors.border-default;
-                x: 0px;
-            }
+            // Rectangle {
+            //     width: 1px;
+            //     height: parent.height;
+            //     background: Colors.border-default;
+            //     x: 0px;
+            // }
 
             MusicPlayer {
                 width: parent.width;

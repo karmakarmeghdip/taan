@@ -8,7 +8,7 @@ pub fn set_track_details(
     ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::PlayerState>();
         app.set_song_title(track.name.into());
-        app.set_music_duration((track.duration_ms / 1000) as i32);
+        app.set_music_duration((track.duration_ms) as i32);
         match track.unique_fields {
             librespot_metadata::audio::UniqueFields::Track { artists, album, .. } => {
                 use librespot_protocol::metadata::artist_with_role::ArtistRole;
@@ -53,7 +53,7 @@ pub fn play() -> anyhow::Result<()> {
 pub fn set_position(position_ms: u32) -> anyhow::Result<()> {
     ui_weak().upgrade_in_event_loop(move |ui| {
         let app = ui.global::<crate::PlayerState>();
-        app.set_current_time((position_ms / 1000) as i32);
+        app.set_current_time((position_ms) as i32);
     })?;
     Ok(())
 }

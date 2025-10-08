@@ -4,7 +4,7 @@ struct Playlist {
     cover-art: image,
 }
 
-struct Track {
+export struct Track {
     title: string,
     id: string,
     duration: int,
@@ -33,8 +33,8 @@ export global PlayerState {
     in property <string> album: "";
     in property <string> artist-name: "";
     in property <string> composer: "";
-    in property <int> current-time: 0; // in seconds
-    in property <int> music-duration: 0; // in seconds
+    in property <int> current-time: 0; // in ms
+    in property <int> music-duration: 0; // in ms
     in property <float> volume: 1.0; // 0.0 to 1.0
     callback play();
     callback pause();
@@ -57,7 +57,7 @@ export global PlaylistsState {
 export global TracksState {
     in property <string> current-playlist-id: "";
     in property <bool> fetching-tracks: false;
-    in property <Track> tracks;
+    in property <[Track]> tracks;
     callback track-clicked(string);
     callback fetch-tracks(string);
 }

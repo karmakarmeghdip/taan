@@ -15,7 +15,7 @@ pub fn register_handlers() -> anyhow::Result<()> {
         spotify().player.pause();
     });
     app.on_seek(|pos| {
-        spotify().player.seek((pos * 1000) as u32);
+        spotify().player.seek(pos as u32);
     });
     rt().spawn(async {
         spotify()
@@ -81,6 +81,7 @@ fn handle_player_event(event: librespot_playback::player::PlayerEvent) {
             player::set_position(position_ms).unwrap();
         }
         librespot_playback::player::PlayerEvent::PositionChanged { position_ms, .. } => {
+            log::info!("Position changed: {}", position_ms);
             player::set_position(position_ms).unwrap();
         }
         librespot_playback::player::PlayerEvent::Seeked { position_ms, .. } => {
