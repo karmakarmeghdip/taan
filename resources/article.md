@@ -6,7 +6,7 @@ Picture this: You're working on your laptop, listening to music on Spotify, and 
 
 That's when I decided: *enough is enough*. I'm building my own.
 
-![Spotify Memory Usage](image.png)
+![Spotify Memory Usage](article/image.png)
 
 Meet **Taan**—a native Spotify client built from the ground up in Rust, delivering the same functionality while using just **24MB of memory**. That's a **96% reduction** in memory consumption.
 
@@ -58,7 +58,7 @@ export component MusicPlayer {
 }
 ```
 
-![main player](image-1.png)
+![main player](article/image-1.png)
 
 Slint's declarative syntax makes building responsive UIs natural. The conditional layouts above automatically adapt between portrait and landscape orientations.
 
@@ -131,7 +131,7 @@ pub async fn get_user_playlists(
 }
 ```
 
-![taan memory usage](image-2.png)
+![taan memory usage](article/image-2.png)
 
 ## The Architecture
 
@@ -223,7 +223,7 @@ fn handle_player_event(event: librespot_playback::player::PlayerEvent) {
 }
 ```
 
-![music playback](image-3.png)
+![music playback](article/image-3.png)
 
 ## Design System: The Slint Way
 
@@ -300,7 +300,7 @@ pub async fn auth(&self) -> Result<(), Error> {
 
 The client opens a browser, user logs in, Spotify redirects to localhost:8898, and we capture the token. Simple and secure.
 
-![login view](image-4.png)
+![login view](article/image-4.png)
 
 ### Token Management & Rate Limiting
 
@@ -347,7 +347,7 @@ Let's talk numbers:
 | **Startup Time** | 10-15s | 1-2s |
 | **Binary Size** | ~90MB | ~15MB |
 
-![Binary size](image-5.png)
+![Binary size](article/image-5.png)
 
 The memory savings are dramatic. This is the power of native code combined with efficient libraries.
 
