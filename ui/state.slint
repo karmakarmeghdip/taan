@@ -52,12 +52,13 @@ export global PlaylistsState {
     callback playlist-clicked(string);
     callback fetch-playlists();
     in property <bool> fetching-playlists: false;
+    in property <string> current-playlist-id: "";
 }
 
 export global TracksState {
-    in property <string> current-playlist-id: "";
+    in-out property <string> current-track-id: "";
     in property <bool> fetching-tracks: false;
-    in property <[Track]> tracks;
+    in property <[Track]> tracks: [];
     callback track-clicked(string);
     callback fetch-tracks(string);
 }

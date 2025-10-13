@@ -128,7 +128,6 @@ export component SavedTracks inherits Rectangle {
     clip: true;
     preferred-width: 1080px;
     preferred-height: 640px;
-    in-out property <string> selected-index: "";
     property <bool> show-album-column: root.width > 680px;
     HorizontalLayout {
         width: parent.width;
@@ -180,10 +179,10 @@ export component SavedTracks inherits Rectangle {
                             album: track.album;
                             duration-text: track.duration;
                             initial: Utils.first-char(track.title);
-                            active: track.id == root.selected-index;
+                            active: track.id == TracksState.current-track-id;
                             show-album: root.show-album-column;
                             clicked => {
-                                root.selected-index = track.id;
+                                TracksState.current-track-id = track.id;
                             }
                         }
                     }
