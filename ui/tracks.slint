@@ -177,12 +177,13 @@ export component SavedTracks inherits Rectangle {
                             title: track.title;
                             artist: track.artist;
                             album: track.album;
-                            duration-text: track.duration;
+                            duration-text: Utils.ms-to-string(track.duration);
                             initial: Utils.first-char(track.title);
                             active: track.id == TracksState.current-track-id;
                             show-album: root.show-album-column;
                             clicked => {
                                 TracksState.current-track-id = track.id;
+                                TracksState.track-clicked(track.id);
                             }
                         }
                     }
@@ -209,5 +210,8 @@ export component SavedTracks inherits Rectangle {
                 height: parent.height;
             }
         }
+    }
+    init => {
+    TracksState.fetch-saved-tracks();
     }
 }

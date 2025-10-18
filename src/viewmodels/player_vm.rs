@@ -99,6 +99,8 @@ fn handle_player_event(event: librespot_playback::player::PlayerEvent) {
                 });
             }
             player::set_track_details(audio_item).unwrap();
+            player::pause().unwrap();
+            player::set_position(0).unwrap();
         }
         librespot_playback::player::PlayerEvent::SessionConnected {
             connection_id,

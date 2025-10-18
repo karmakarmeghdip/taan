@@ -13,12 +13,8 @@ use librespot_playback::{
     mixer::NoOpVolume,
     player::Player,
 };
-use rspotify::{
-    AuthCodeSpotify, ClientError,
-    http::HttpError,
-    model::{PlaylistId, PlaylistItem, SimplifiedPlaylist},
-    prelude::{BaseClient, OAuthClient},
-};
+use rspotify::{AuthCodeSpotify, ClientError, http::HttpError, model::{PlaylistId, PlaylistItem, SimplifiedPlaylist}, prelude::{BaseClient, OAuthClient}, ClientResult};
+use rspotify::model::SavedTrack;
 
 pub const SPOTIFY_CLIENT_ID: &str = "65b708073fc0480ea92a077233ca87bd";
 
@@ -110,7 +106,8 @@ impl SpotifyService {
             .credentials()
             .ok_or(Error::unauthenticated("No cache in session"))?;
         self.session.connect(creds, true).await?;
-        self.load_track("spotify:track:30aPCMAtkH6Cf5ejzY4cE4".to_string())?;
+        self.web_auth().await?;
+        // self.load_track("spotify:track:30aPCMAtkH6Cf5ejzY4cE4".to_string())?;
         Ok(())
     }
     pub async fn connect(&self, creds: Credentials) -> anyhow::Result<()> {
@@ -194,8 +191,24 @@ impl SpotifyService {
         }
     }
 
+    pub async fn get_saved_tracks(&self) -> anyhow::Result<Vec<SavedTrack>> {
+        loop {
+            match self.client.current_user_saved_tracks_manual(None, Some(20), None).await {
+                Ok(tracks) => {
+                    break anyhow::Ok(tracks.items);
+                }
+                Err(e) => {
+                    if self.requires_refresh(e).await {
+                        continue;
+                    }
+                    break Err(anyhow::anyhow!("Failed to refresh client"));
+                }
+            }
+        }
+    }
+
     pub fn load_track(&self, id: String) -> Result<(), Error> {
-        let track_id = SpotifyId::from_uri(&id)?;
+        let track_id = SpotifyId::from_uri(&format!("spotify:track:{}", id))?;
         self.player.load(track_id, false, 0);
         log::info!("Loaded track {}", id);
         Ok(())
